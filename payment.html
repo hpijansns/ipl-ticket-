@@ -5,16 +5,107 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Payment - IPL Tickets</title>
 <style>
-body{font-family:sans-serif;background:#f0f0f0;margin:0;padding:0;}
-.container{max-width:800px;margin:30px auto;padding:20px;}
-.payment-box{background:#fff;padding:30px;border-radius:15px;box-shadow:0 12px 25px rgba(0,0,0,0.1);text-align:center;border-top:6px solid #0b81d1;}
-.payment-box h2{margin-bottom:20px;color:#000;}
-.match-info img{width:100px;margin:5px;border-radius:10px;}
-.seats-list{display:flex;flex-wrap:wrap;justify-content:center;list-style:none;padding:0;margin:10px 0;}
-.seats-list li{background:#0b81d1;color:#fff;padding:8px 12px;margin:5px;border-radius:8px;}
-#utrInput{padding:12px;width:260px;margin-top:15px;text-align:center;border-radius:8px;border:1px solid #ccc;}
-#payWithUTR{padding:14px 25px;margin-top:20px;border:none;border-radius:10px;color:#fff;background:green;cursor:pointer;}
-#payWithUTR:hover{background:darkgreen;}
+body{
+  font-family:sans-serif;
+  background:#f0f0f0;
+  margin:0;
+  padding:0;
+}
+.container{
+  max-width:800px;
+  margin:30px auto;
+  padding:20px;
+}
+.payment-box{
+  background:#fff;
+  padding:30px;
+  border-radius:15px;
+  box-shadow:0 12px 25px rgba(0,0,0,0.1);
+  text-align:center;
+  border-top:6px solid #0b81d1;
+}
+.payment-box h2{
+  margin-bottom:20px;
+  color:#000;
+}
+.match-info img{
+  width:100px;
+  margin:5px;
+  border-radius:10px;
+}
+.seats-list{
+  display:flex;
+  flex-wrap:wrap;
+  justify-content:center;
+  list-style:none;
+  padding:0;
+  margin:10px 0;
+}
+.seats-list li{
+  background:#0b81d1;
+  color:#fff;
+  padding:8px 12px;
+  margin:5px;
+  border-radius:8px;
+  font-weight:500;
+}
+#utrInput{
+  padding:12px;
+  width:260px;
+  margin-top:15px;
+  text-align:center;
+  border-radius:8px;
+  border:1px solid #ccc;
+  font-size:16px;
+}
+#payWithUTR{
+  padding:14px 25px;
+  margin-top:20px;
+  border:none;
+  border-radius:10px;
+  color:#fff;
+  background:linear-gradient(90deg,#4caf50,#43a047);
+  cursor:pointer;
+  font-size:16px;
+  font-weight:700;
+  transition:0.3s;
+}
+#payWithUTR:hover{
+  background:linear-gradient(90deg,#43a047,#388e3c);
+}
+.qr-container img{
+  width:200px;
+  height:200px;
+  margin:15px 0;
+}
+
+/* Mobile responsiveness */
+@media(max-width:600px){
+  .container{
+    margin:15px;
+    padding:15px;
+  }
+  .match-info img{
+    width:80px;
+    margin:5px;
+  }
+  #utrInput{
+    width:90%;
+  }
+  #payWithUTR{
+    width:90%;
+    padding:12px 0;
+  }
+  .qr-container img{
+    width:150px;
+    height:150px;
+  }
+  .seats-list li{
+    padding:6px 10px;
+    margin:4px;
+    font-size:14px;
+  }
+}
 </style>
 </head>
 <body>
@@ -42,49 +133,54 @@ body{font-family:sans-serif;background:#f0f0f0;margin:0;padding:0;}
 </div>
 
 <script>
-// Step 1: Get ticket info from localStorage
-let ticketData = localStorage.getItem('paymentInfo');
-if(!ticketData){
-    alert("No ticket info found. Please select seats first.");
-    window.location.href="seat-selection.html";
-} else {
-    ticketData = JSON.parse(ticketData);
-}
+document.addEventListener('DOMContentLoaded', function(){
 
-// Step 2: Show match info
-document.getElementById('matchInfo').innerHTML = `
-  <strong>${ticketData.matchDetails.teams}</strong><br>
-  ${ticketData.matchDetails.date} | ${ticketData.matchDetails.time || '—'} | ${ticketData.matchDetails.stadium}
-  <br><img src="${ticketData.matchDetails.img1}" alt="Team 1">
-  <img src="${ticketData.matchDetails.img2}" alt="Team 2">
-`;
-
-// Step 3: Show selected seats
-const seatList = document.getElementById('seatList');
-seatList.innerHTML = "";
-ticketData.seats.forEach(seat=>{
-    const li = document.createElement('li');
-    li.textContent = seat;
-    seatList.appendChild(li);
-});
-
-// Step 4: Show total amount
-document.getElementById('totalAmount').textContent = `Total Amount: ₹${ticketData.total}`;
-
-// Step 5: Pay Now button click
-document.getElementById('payWithUTR').addEventListener('click', ()=>{
-    const utr = document.getElementById('utrInput').value.trim();
-    if(!/^\d{12}$/.test(utr)){
-        alert("❌ Enter a valid 12-digit UTR.");
+    // Get ticket info from seat selection page
+    let ticketData = localStorage.getItem('paymentInfo');
+    if(!ticketData){
+        alert("No ticket info found! Please select seats first.");
+        window.location.href="seat-selection.html";
         return;
     }
+    ticketData = JSON.parse(ticketData);
 
-    // Save UTR into ticketData
-    ticketData.utr = utr;
-    localStorage.setItem('finalTicket', JSON.stringify(ticketData));
+    // Display match info with images
+    document.getElementById('matchInfo').innerHTML = `
+      <strong>${ticketData.matchDetails.teams}</strong><br>
+      ${ticketData.matchDetails.date} | ${ticketData.matchDetails.time || '—'} | ${ticketData.matchDetails.stadium}
+      <br><img src="${ticketData.matchDetails.img1}" alt="Team 1">
+      <img src="${ticketData.matchDetails.img2}" alt="Team 2">
+    `;
 
-    // Directly redirect to ticket.html
-    window.location.href = "ticket.html";
+    // Display selected seats
+    const seatList = document.getElementById('seatList');
+    seatList.innerHTML = "";
+    ticketData.seats.forEach(seat=>{
+        const li = document.createElement('li');
+        li.textContent = seat;
+        seatList.appendChild(li);
+    });
+
+    // Display total amount
+    document.getElementById('totalAmount').textContent = `Total Amount: ₹${ticketData.total}`;
+
+    // Pay Now button click
+    document.getElementById('payWithUTR').addEventListener('click', function(){
+        const utr = document.getElementById('utrInput').value.trim();
+
+        if(!/^\d{12}$/.test(utr)){
+            alert("❌ Enter a valid 12-digit UTR.");
+            return;
+        }
+
+        // Save UTR and all ticket data for ticket page
+        ticketData.utr = utr;
+        localStorage.setItem('finalTicket', JSON.stringify(ticketData));
+
+        // Redirect to ticket.html
+        setTimeout(()=>{ window.location.href = "ticket.html"; }, 50);
+    });
+
 });
 </script>
 
