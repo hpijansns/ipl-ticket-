@@ -28,7 +28,7 @@ body {
 }
 .payment-box h2 {font-size:28px;margin-bottom:20px;color:#000;font-weight:700;}
 .match-info {text-align:center;margin-bottom:20px;}
-.match-info img {max-width:100%;border-radius:10px;margin-top:10px;}
+.match-info img {max-width:100px;border-radius:10px;margin:10px;}
 .seats-list {display:flex;flex-wrap:wrap;justify-content:center;list-style:none;padding:0;margin:10px 0 20px 0;}
 .seats-list li {background:#0b81d1;color:#fff;padding:8px 12px;margin:5px;border-radius:8px;font-weight:500;}
 .total-amount {font-size:20px;font-weight:700;margin-bottom:15px;}
@@ -73,7 +73,7 @@ button#payWithUTR:hover {background:linear-gradient(90deg,#43a047,#388e3c);}
 
 <script>
 // Get ticket data from seat selection page
-const ticketData = JSON.parse(localStorage.getItem('paymentInfo')); // Ye seat selection page se aayega
+const ticketData = JSON.parse(localStorage.getItem('paymentInfo')); 
 if(!ticketData){ 
   alert("No data found! Please select your seats again.");
   window.location.href="seat-selection.html";
@@ -116,8 +116,8 @@ document.getElementById('payWithUTR').addEventListener('click', ()=>{
     ticketData.utr = transactionID;
     localStorage.setItem('finalTicket', JSON.stringify(ticketData));
 
-    alert("✅ Payment Successful! Redirecting to your Ticket...");
-    window.location.href = "ticket.html"; // Same ticket page
+    // Directly redirect to ticket page
+    window.location.href = "ticket.html"; 
 });
 </script>
 
