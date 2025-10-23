@@ -1,0 +1,238 @@
+<!doctype html>
+<html lang="hi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Realistic IPL Ticket Admin & Preview</title>
+<style>
+body{
+  font-family:sans-serif;
+  margin:20px;
+  background:#f0f0f0;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+}
+h2{margin-bottom:10px;}
+label{display:block; margin-top:10px;}
+input[type="text"], input[type="file"]{width:100%; padding:6px; margin-top:4px;}
+button{margin-top:12px; padding:8px 14px; font-size:14px; cursor:pointer;}
+#ticket{margin-top:30px; transition:all 0.3s ease;}
+
+/* Root Variables */
+:root{
+  --page-w:980px;
+  --paper:#fffdf9;
+  --muted:#666;
+  --blue:#0b81d1;
+  --blue-deep:#0468a8;
+}
+
+*{box-sizing:border-box;}
+
+/* Ticket Container */
+.ticket {
+  width:var(--page-w);
+  max-width:98vw;
+  background: var(--paper);
+  border-radius:10px;
+  box-shadow:0 20px 40px rgba(0,0,0,0.25);
+  position:relative;
+  overflow:hidden;
+  padding:18px;
+  transition:all 0.3s ease;
+  background-size:cover;
+  background-position:center;
+}
+
+/* Meta Left/Right */
+.meta-left, .meta-right{
+  position:absolute; font-size:12px; color:var(--muted); line-height:1.12;
+}
+.meta-left{left:18px; top:16px; text-align:left;}
+.meta-right{right:16px; top:16px; text-align:right;}
+.meta-left b, .meta-right b{display:block; font-weight:900; color:#111; font-size:13px;}
+
+/* Top-center price */
+.top-center-price{
+  position:absolute; left:50%; transform:translateX(-50%); top:14px; font-size:12px; color:var(--muted); text-align:center; line-height:1.15;
+}
+.top-center-price b{display:block; font-weight:900; color:#111; margin-top:3px;}
+
+/* Main Content */
+.main{display:flex; gap:14px; align-items:stretch; padding:36px 34px 18px 34px; position:relative;}
+
+.left{
+  width:270px;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  gap:9px;
+}
+.left .biglogo{
+  width:170px;
+  min-height:100px; 
+  max-height:140px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  background:#fafafa;
+  border-radius:6px;
+  overflow:hidden;
+  box-shadow:0 4px 12px rgba(0,0,0,0.1);
+}
+.left .biglogo img{
+  width:100%;
+  height:100%;
+  object-fit:contain;
+}
+.left .teamname{
+  font-weight:800; color:#222; font-size:14px; text-align:center; letter-spacing:0.2px;
+}
+
+.center{
+  flex:1; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:6px; position:relative;
+}
+.center .small-logos{display:flex; gap:12px;}
+.center .small-logos .box{width:96px; height:34px; border-radius:5px; background:#f5f5f5; display:flex; align-items:center; justify-content:center; overflow:hidden;}
+.center .small-logos .box img{max-width:84%; max-height:84%;}
+.center .matchno{font-weight:900; font-size:15px; color:#111;}
+.center .teams{margin-top:2px; font-weight:800; font-size:15px; text-align:center;}
+.center .date{margin-top:6px; font-size:13.5px; color:var(--muted); text-align:center;}
+.center .stadium{margin-top:4px; font-size:13px; color:var(--muted); text-align:center;}
+.gate-ghost{position:absolute; right:22%; top:-8%; font-size:84px; font-weight:900; color:rgba(0,0,0,0.05); pointer-events:none; transform: translateY(10%);}
+
+.right{width:250px; display:flex; flex-direction:column; align-items:center; gap:9px; padding-left:12px; border-left:1px dashed rgba(0,0,0,0.07); background:linear-gradient(90deg, rgba(255,255,255,0.6), rgba(250,250,250,0.95));}
+.right .mini{width:130px; height:58px; border-radius:6px; background:#fafafa; display:flex; align-items:center; justify-content:center; overflow:hidden;}
+.right .mini img{max-width:100%; max-height:100%; object-fit:contain;}
+.right .mini-text{font-size:13px; color:var(--muted); text-align:center; line-height:1.05;}
+.right .tot{ font-weight:900; color:#111; font-size:13.5px; margin-top:4px;}
+
+.bottom{margin-top:14px; background: linear-gradient(180deg, var(--blue), var(--blue-deep)); color:#fff; border-radius:6px; padding:12px 14px; display:flex; gap:10px; align-items:center; justify-content:space-between; font-weight:900;}
+.bottom .cell{flex:1; text-align:center; font-size:19px;}
+.bottom .cell small{ display:block; font-size:11px; font-weight:700; opacity:0.95; margin-bottom:6px;}
+
+.perfor{position:absolute; right:252px; top:58px; height:190px; border-left:3px dotted rgba(0,0,0,0.15); pointer-events:none;}
+.notch{position:absolute; left:8px; bottom:78px; width:18px; height:18px; border-radius:50%; background:var(--blue);}
+
+@media (max-width:900px){
+  .right { display:none; }
+  .perfor { display:none; }
+  .gate-ghost { display:none; }
+  .left { width:200px; }
+  .left .biglogo{ width:150px; height:86px; }
+}
+</style>
+</head>
+<body>
+<h2>Admin Panel — Update Ticket</h2>
+<label>Left Logo: <input type="file" id="leftLogoInput"></label>
+<label>Mini Logo: <input type="file" id="miniLogoInput"></label>
+<label>Small Logo 1 (IPL): <input type="file" id="iplLogoInput"></label>
+<label>Small Logo 2 (SRH): <input type="file" id="srhSmallInput"></label>
+<label>Background: <input type="file" id="bgInput"></label>
+<label>Teams Text: <input type="text" id="teamsTextInput" placeholder="Mumbai Indians vs Sunrisers Hyderabad"></label>
+<label>Date: <input type="text" id="dateTextInput" placeholder="Tuesday, 24 Apr 2018, 8:00 pm"></label>
+<label>Stadium: <input type="text" id="stadTextInput" placeholder="Wankhede Stadium: Mumbai"></label>
+<button id="updateBtn">Update Ticket</button>
+
+<!-- Ticket Preview -->
+<div class="ticket" id="ticket">
+
+  <div class="meta-left">
+    Sr. No.: <b id="sr-left">170098</b>
+    Roll No.: <b id="roll-left">0681</b>
+    <div style="margin-top:6px; font-weight:700">ADMIT ONE</div>
+    <div style="font-size:12px; margin-top:6px" id="code-left">A000292</div>
+  </div>
+
+  <div class="top-center-price">
+    BASE PRICE: Rs.1953.12<br/>
+    + CGST: Rs.273.44 + SGST: Rs.273.44<br/>
+    <b>TOTAL: Rs.2500</b>
+  </div>
+
+  <div class="meta-right">
+    Sr. No.: <b id="sr-right">170098</b>
+    Roll No.: <b id="roll-right">0681</b>
+    <div style="margin-top:6px; font-weight:700">ADMIT ONE</div>
+    <div style="font-size:12px; margin-top:6px" id="code-right">A000291</div>
+  </div>
+
+  <div class="main">
+    <div class="left">
+      <div class="biglogo"><img id="leftLogo" src="https://upload.wikimedia.org/wikipedia/en/3/38/Mumbai_Indians_Logo.png" alt=""></div>
+      <div class="teamname" id="leftTeam">Mumbai Indians</div>
+    </div>
+
+    <div class="center">
+      <div class="small-logos">
+        <div class="box"><img id="iplLogo" src="https://upload.wikimedia.org/wikipedia/commons/3/3a/Indian_Premier_League_logo.svg" alt=""></div>
+        <div class="box"><img id="srhSmall" src="https://upload.wikimedia.org/wikipedia/en/2/2e/Sunrisers_Hyderabad_Logo.png" alt=""></
+        
+        ></div>
+      </div>
+      <div class="matchno" id="matchNo">Match No. 4</div>
+      <div class="teams" id="teamsText">Mumbai Indians <strong>vs</strong> Sunrisers Hyderabad</div>
+      <div class="date" id="dateText">Tuesday, 24 Apr 2018, 8:00 pm</div>
+      <div class="stadium" id="stadText">Wankhede Stadium: Mumbai</div>
+      <div class="gate-ghost" id="gateGhost">4</div>
+    </div>
+
+    <div class="right">
+      <div class="mini"><img id="miniLogo" src="https://upload.wikimedia.org/wikipedia/en/3/38/Mumbai_Indians_Logo.png" alt=""></div>
+      <div class="mini-text" id="miniText">Mumbai Indians<br/><strong>vs<br/>Sunrisers Hyderabad</strong></div>
+      <div class="tot">TOTAL: Rs.2500</div>
+    </div>
+
+    <div class="perfor"></div>
+  </div>
+
+  <div class="notch"></div>
+
+  <div class="bottom">
+    <div class="cell"><small>ENTRY FROM</small>University Sports Ground</div>
+    <div class="cell"><small>STAIRCASE</small>8</div>
+    <div class="cell"><small>SEAT</small>8</div>
+    <div class="cell"><small>GATE</small>4</div>
+  </div>
+
+</div>
+
+<script>
+// Helper: file input -> image preview
+function fileToImg(inputId,imgId){
+  document.getElementById(inputId).addEventListener('change', e=>{
+    const file = e.target.files[0];
+    if(file){
+      const url = URL.createObjectURL(file);
+      if(imgId==='ticket'){
+        document.getElementById(imgId).style.backgroundImage = `url(${url})`;
+        document.getElementById(imgId).style.backgroundSize = 'cover';
+        document.getElementById(imgId).style.backgroundPosition = 'center';
+      } else {
+        document.getElementById(imgId).src = url;
+      }
+    }
+  });
+}
+
+// Apply inputs
+fileToImg('leftLogoInput','leftLogo');
+fileToImg('miniLogoInput','miniLogo');
+fileToImg('iplLogoInput','iplLogo');
+fileToImg('srhSmallInput','srhSmall');
+fileToImg('bgInput','ticket'); // background
+
+// Update text inputs
+document.getElementById('updateBtn').addEventListener('click', ()=>{
+  const teams = document.getElementById('teamsTextInput').value;
+  const date = document.getElementById('dateTextInput').value;
+  const stadium = document.getElementById('stadTextInput').value;
+  if(teams) document.getElementById('teamsText').innerHTML = teams;
+  if(date) document.getElementById('dateText').textContent = date;
+  if(stadium) document.getElementById('stadText').textContent = stadium;
+});
+</script>
+</body>
+</html>
