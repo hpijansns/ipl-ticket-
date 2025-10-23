@@ -17,6 +17,7 @@ body {
   margin:0;
   min-height:100vh;
   display:flex;
+  flex-direction:column;
   justify-content:center;
   align-items:center;
   background:#e0e0e0;
@@ -130,13 +131,14 @@ body {
     <div class="cell"><small>SEAT</small><span id="seat"></span></div>
     <div class="cell"><small>GATE</small><span id="gate"></span></div>
   </div>
-
-  <button id="downloadBtn">Download Ticket</button>
 </div>
+
+<!-- Download Button Outside Ticket -->
+<button id="downloadBtn">Download Ticket</button>
 
 <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
 <script>
-// Fetch finalTicket from localStorage
+// Fetch ticket data
 const ticketData = JSON.parse(localStorage.getItem('finalTicket'));
 if(!ticketData){
   alert("No ticket data found! Please pay first.");
@@ -151,35 +153,30 @@ document.getElementById('leftLogo').src = ticketData.match.teamLogo || '';
 document.getElementById('leftTeam').textContent = ticketData.match.teamName || ticketData.match.teams.split(' vs ')[0];
 document.getElementById('srhSmall').src = ticketData.match.opponentLogo || '';
 document.getElementById('matchNo').textContent = ticketData.match.matchNo || 'Match No. 1';
-document.getElementById('teamsText').innerHTML = ticketData.match.teams || '';
-document.getElementById('dateText').textContent = ticketData.match.date;
-document.getElementById('stadText').textContent = ticketData.match.stadium;
+document.getElementById('teamsText').textContent = ticketData.match.teams || '';
+document.getElementById('dateText').textContent = ticketData.match.date || '';
+document.getElementById('stadText').textContent = ticketData.match.stadium || '';
 document.getElementById('gateGhost').textContent = ticketData.gate || '1';
 document.getElementById('miniLogo').src = ticketData.match.teamLogo || '';
-document.getElementById('miniText').innerHTML = ticketData.match.teams || '';
+document.getElementById('miniText').textContent = ticketData.match.teams || '';
 document.getElementById('entryFrom').textContent = ticketData.entry || 'Main Entrance';
 document.getElementById('staircase').textContent = ticketData.staircase || '1';
-document.getElementById('seat').textContent = ticketData.seats.join(', ') || '';
+document.getElementById('seat').textContent = ticketData.seats ? ticketData.seats.join(', ') : '';
 document.getElementById('gate').textContent = ticketData.gate || '1';
 
-// Download button with confetti
+// Download functionality
 document.getElementById('downloadBtn').addEventListener('click', () => {
-    confetti({
-      particleCount: 150,
-      spread: 70,
-      origin: { y: 0.6 }
-    });
+    confetti({ particleCount: 150, spread: 70, origin: { y: 0.6 } });
     alert("🎉 Congratulations! Your ticket is ready to download.");
-    // Optionally generate image
     html2canvas(document.getElementById('ticket')).then(canvas=>{
-      const link = document.createElement('a');
-      link.href = canvas.toDataURL('image/png');
-      link.download = 'IPL_Ticket.png';
-      link.click();
+        const link = document.createElement('a');
+        link.href = canvas.toDataURL('image/png');
+        link.download = 'IPL_Ticket.png';
+        link.click();
     });
 });
 
-// html2canvas library
+// Load html2canvas
 const script = document.createElement('script');
 script.src = "https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js";
 document.body.appendChild(script);
