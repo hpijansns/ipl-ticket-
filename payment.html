@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Payment - IPL Tickets</title>
+<link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+body {
+  margin: 0;
+  padding: 0;
+  font-family: 'Roboto', sans-serif;
+  background: #f0f0f0;
+  color: #000;
+}
+.container {
+  max-width: 800px;
+  margin: 30px auto;
+  padding: 20px;
+}
+.payment-box {
+  background:#fff;
+  border-radius:15px;
+  padding:30px;
+  box-shadow:0 12px 25px rgba(0,0,0,0.1);
+  text-align:center;
+  border-top:6px solid #0b81d1;
+}
+.payment-box h2 {font-size:28px;margin-bottom:20px;color:#000;font-weight:700;}
+.match-info {text-align:center;margin-bottom:20px;}
+.match-info img {max-width:100%;border-radius:10px;margin-top:10px;}
+.seats-list {display:flex;flex-wrap:wrap;justify-content:center;list-style:none;padding:0;margin:10px 0 20px 0;}
+.seats-list li {background:#0b81d1;color:#fff;padding:8px 12px;margin:5px;border-radius:8px;font-weight:500;}
+.total-amount {font-size:20px;font-weight:700;margin-bottom:15px;}
+.qr-container {margin:20px 0;display:inline-block;padding:15px;border:2px dashed #0b81d1;border-radius:15px;background:#f9f9f9;}
+.qr-container img {width:200px;height:200px;}
+input#utrInput {padding:12px;font-size:16px;width:260px;border-radius:8px;border:1px solid #ccc;margin-top:15px;text-align:center;}
+button#payWithUTR {
+  padding:14px 25px;font-size:16px;font-weight:700;border:none;border-radius:10px;cursor:pointer;color:#fff;
+  background:linear-gradient(90deg,#4caf50,#43a047);margin-top:20px;transition:0.3s;
+}
+button#payWithUTR:hover {background:linear-gradient(90deg,#43a047,#388e3c);}
+@media(max-width:600px){
+  input#utrInput {width:90%;}
+  .qr-container img {width:150px;height:150px;}
+}
+</style>
+</head>
+<body>
+
+<div class="container">
+<div class="payment-box">
+<h2>Scan & Pay</h2>
+
+<div class="match-info" id="matchInfo"></div>
+
+<h3>Seats Selected</h3>
+<ul class="seats-list" id="seatList"></ul>
+
+<p class="total-amount" id="totalAmount"></p>
+
+<div class="qr-container">
+<img src="https://iili.io/K8pC8WG.png" alt="Scan to Pay QR">
+</div>
+
+<p>Enter Transaction ID after payment:</p>
+<input type="text" id="utrInput" placeholder="Enter 12-digit UTR">
+
+<br>
+<button id="payWithUTR">Pay Now</button>
+</div>
+</div>
+
+<script>
+// Get ticket data from seat selection page
+const ticketData = JSON.parse(localStorage.getItem('paymentInfo')); // Ye seat selection page se aayega
+if(!ticketData){ 
+  alert("No data found! Please select your seats again.");
+  window.location.href="seat-selection.html";
+}
+
+// Show match info
+document.getElementById('matchInfo').innerHTML = `
+  <strong>${ticketData.matchDetails.teams}</strong><br>
+  ${ticketData.matchDetails.date} | ${ticketData.matchDetails.time || '—'} | ${ticketData.matchDetails.stadium}
+  <br><img src="${ticketData.matchDetails.img1}" alt="Team 1">
+  <img src="${ticketData.matchDetails.img2}" alt="Team 2">
+`;
+
+// Show selected seats
+const seatList = document.getElementById('seatList');
+seatList.innerHTML = "";
+ticketData.seats.forEach(seat=>{
+  const li = document.createElement('li');
+  li.textContent = seat;
+  seatList.appendChild(li);
+});
+
+// Show total amount
+document.getElementById('totalAmount').textContent = `Total Amount: ₹${ticketData.total}`;
+
+// Pay button click
+document.getElementById('payWithUTR').addEventListener('click', ()=>{
+    const transactionID = document.getElementById('utrInput').value.trim();
+
+    // Validate 12-digit UTR
+    const utrRegex = /^\d{12}$/;
+    const invalidSeqs = ['123456789012','111111111111','000000000000','112233445566'];
+
+    if(!utrRegex.test(transactionID) || invalidSeqs.includes(transactionID)){
+        alert("❌ Invalid Transaction ID! Please enter a valid 12-digit UTR.");
+        return;
+    }
+
+    // Save UTR with ticket data
+    ticketData.utr = transactionID;
+    localStorage.setItem('finalTicket', JSON.stringify(ticketData));
+
+    alert("✅ Payment Successful! Redirecting to your Ticket...");
+    window.location.href = "ticket.html"; // Same ticket page
+});
+</script>
+
+</body>
+</html>
