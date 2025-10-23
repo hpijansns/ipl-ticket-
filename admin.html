@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>IPL Admin Panel</title>
+<style>
+body{font-family:sans-serif;background:#f0f0f0;margin:0;padding:0;}
+.container{max-width:900px;margin:20px auto;padding:20px;background:#fff;border-radius:10px;box-shadow:0 8px 20px rgba(0,0,0,0.1);}
+header{background:#333545;color:#fff;padding:15px;display:flex;justify-content:space-between;align-items:center;border-radius:10px 10px 0 0;}
+header h3{margin:0;}
+header button{padding:6px 12px;background:#f84464;color:#fff;border:none;border-radius:5px;cursor:pointer;}
+header button:hover{background:#c4242b;}
+form input, form button{padding:10px;margin:5px;border-radius:5px;border:1px solid #ccc;font-size:14px;}
+form button{background:#f84464;color:#fff;border:none;cursor:pointer;}
+form button:hover{background:#c4242b;}
+table{width:100%;border-collapse:collapse;margin-top:20px;}
+table, th, td{border:1px solid #ccc;}
+th, td{padding:10px;text-align:center;}
+button.edit, button.delete{padding:5px 10px;border:none;border-radius:5px;cursor:pointer;}
+button.edit{background:#4caf50;color:#fff;}
+button.edit:hover{background:#388e3c;}
+button.delete{background:#f44336;color:#fff;}
+button.delete:hover{background:#c4242b;}
+#loginBox{background:#fff;padding:30px;border-radius:10px;box-shadow:0 8px 20px rgba(0,0,0,0.1);width:320px;text-align:center;margin:50px auto;}
+#loginBox input{width:100%;padding:10px;margin:10px 0;border-radius:6px;border:1px solid #ccc;font-size:14px;}
+#loginBox button{width:100%;padding:11px;background:#f84464;color:#fff;border:none;border-radius:6px;cursor:pointer;font-size:16px;}
+#loginBox button:hover{background:#c4242b;}
+img.preview{width:50px;height:50px;object-fit:contain;border-radius:5px;}
+</style>
+</head>
+<body>
+
+<div id="loginBox">
+<h2>Admin Login</h2>
+<input type="text" id="username" placeholder="Phone / Username">
+<input type="password" id="password" placeholder="Password">
+<button onclick="login()">Login</button>
+<p style="font-size:12px;color:#666;margin-top:10px;">Demo: <strong>7627055204</strong> / <strong>Pooja2005</strong></p>
+</div>
+
+<div class="container" id="dashboard" style="display:none;">
+<header>
+<h3>Admin Dashboard - <span id="adminUser"></span></h3>
+<button onclick="logout()">Logout</button>
+</header>
+
+<h2>Manage Matches</h2>
+
+<form id="matchForm">
+<input type="text" id="teams" placeholder="Team1 vs Team2" required>
+<input type="date" id="date" required>
+<input type="time" id="time" required>
+<input type="text" id="stadium" placeholder="Stadium" required>
+<label>Team1 Image:</label>
+<input type="file" id="img1" accept="image/*" required>
+<label>Team2 Image:</label>
+<input type="file" id="img2" accept="image/*" required>
+<button type="submit">Add Match</button>
+</form>
+
+<table>
+<thead>
+<tr>
+<th>#</th>
+<th>Teams</th>
+<th>Date</th>
+<th>Time</th>
+<th>Stadium</th>
+<th>Team1 Img</th>
+<th>Team2 Img</th>
+<th>Actions</th>
+</tr>
+</thead>
+<tbody id="matchesTable"></tbody>
+</table>
+</div>
+
+<script>
+const ADMIN_USER = "7627055204";
+const ADMIN_PASS = "Pooja2005";
+
+// Login
+function login(){
+    const user = document.getElementById('username').value.trim();
+    const pass = document.getElementById('password').value.trim();
+    if(user === ADMIN_USER && pass === ADMIN_PASS){
+        localStorage.setItem('isAdmin','true');
+        localStorage.setItem('adminUser', ADMIN_USER);
+        showDashboard();
+    } else {
+        alert("Invalid username or password");
+    }
+}
+
+// Logout
+function logout(){
+    localStorage.removeItem('isAdmin');
+    localStorage.removeItem('adminUser');
+    document.getElementById('dashboard').style.display = "none";
+    document.getElementById('loginBox').style.display = "block";
+}
+
+// Show dashboard
+function showDashboard(){
+    document.getElementById('loginBox').style.display = "none";
+    document.getElementById('dashboard').style.display = "block";
+    document.getElementById('adminUser').textContent = localStorage.getItem('adminUser');
+    renderTable();
+}
+
+// Matches data
+let matches = JSON.parse(localStorage.getItem('iplMatches')) || [];
+const tableBody = document.getElementById('matchesTable');
+
+function renderTable(){
+    tableBody.innerHTML = '';
+    matches.forEach((m,i)=>{
+        tableBody.innerHTML += `<tr>
+        <td>${i+1}</td>
+        <td>${m.teams}</td>
+        <td>${m.date}</td>
+        <td>${m.time}</td>
+        <td>${m.stadium}</td>
+        <td><img src="${m.img1}" class="preview"></td>
+        <td><img src="${m.img2}" class="preview"></td>
+        <td>
+            <button class="edit" onclick="editMatch(${i})">Edit</button>
+            <button class="delete" onclick="deleteMatch(${i})">Delete</button>
+        </td>
+        </tr>`;
+    });
+}
+
+// Convert uploaded file to base64
+function toBase64(file) {
+  return new Promise((resolve,reject)=>{
+    const reader = new FileReader();
+    reader.readAsDataURL(file);
+    reader.onload = () => resolve(reader.result);
+    reader.onerror = error => reject(error);
+  });
+}
+
+// Add match
+document.getElementById('matchForm').addEventListener('submit', async function(e){
+    e.preventDefault();
+    const img1File = document.getElementById('img1').files[0];
+    const img2File = document.getElementById('img2').files[0];
+    if(!img1File || !img2File){ alert("Please select both images"); return; }
+    const match = {
+        teams: document.getElementById('teams').value,
+        date: document.getElementById('date').value,
+        time: document.getElementById('time').value,
+        stadium: document.getElementById('stadium').value,
+        img1: await toBase64(img1File),
+        img2: await toBase64(img2File)
+    };
+    matches.push(match);
+    localStorage.setItem('iplMatches', JSON.stringify(matches));
+    renderTable();
+    this.reset();
+});
+
+// Edit match
+function editMatch(index){
+    const m = matches[index];
+    document.getElementById('teams').value = m.teams;
+    document.getElementById('date').value = m.date;
+    document.getElementById('time').value = m.time;
+    document.getElementById('stadium').value = m.stadium;
+    matches.splice(index,1);
+    localStorage.setItem('iplMatches', JSON.stringify(matches));
+    renderTable();
+}
+
+// Delete match
+function deleteMatch(index){
+    if(confirm("Are you sure you want to delete this match?")){
+        matches.splice(index,1);
+        localStorage.setItem('iplMatches', JSON.stringify(matches));
+        renderTable();
+    }
+}
+
+// Auto login
+if(localStorage.getItem('isAdmin') === 'true'){
+    showDashboard();
+}
+</script>
+
+</body>
+</html>
