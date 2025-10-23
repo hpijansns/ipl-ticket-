@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Booking Summary</title>
+<script src="right_click.js"></script>
+<style>
+body {
+  font-family: Arial, sans-serif;
+  background: #f9f9f9;
+  margin: 0;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 20px;
+}
+
+.match-card, .box, .seat-map {
+  background: white;
+  padding: 25px;
+  border-radius: 10px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+  max-width: 500px;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+h2 {
+  margin-bottom: 20px;
+  font-size: 22px;
+}
+
+/* Match Details */
+.match-card img {
+  max-width: 100%;
+  border-radius: 10px;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+}
+
+.match-card .teams {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 20px;
+  margin-top: 10px;
+}
+
+.match-card .teams img {
+  width: 120px;
+  height: 120px;
+  object-fit: contain;
+  border-radius: 8px;
+}
+
+.match-card .vs {
+  font-size: 32px;
+  font-weight: 700;
+  color: #f84464;
+}
+
+/* Seat Map */
+.seat-map {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 12px;
+  margin-bottom: 20px;
+}
+.seat-type {
+  flex: 1 1 40%;
+  padding: 15px;
+  text-align: center;
+  color: #fff;
+  font-weight: bold;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: 0.3s;
+}
+.seat-type.active { outline: 4px solid #000; transform: scale(1.05); }
+
+/* Color-coded seat types */
+.general {background:#6EC6FF;}
+.premium {background:#81C784;}
+.pavilion {background:#FFF176;color:#000;}
+.vip {background:#FFB74D;color:#000;}
+.corporate {background:#E57373;}
+.hospitality {background:#F06292;}
+.skybox {background:#3949AB;}
+
+/* Booking Summary */
+.description {
+  margin: 10px 0;
+  padding: 10px;
+  background: #e3f0ff;
+  border: 1px solid #4285f4;
+  border-radius: 5px;
+  display: none;
+}
+.price, .qty { margin-top: 15px; }
+.qty input {
+  width: 40px;
+  text-align: center;
+  font-size: 16px;
+}
+.qty button { padding: 5px 10px; font-size: 16px; cursor: pointer; }
+.total {
+  margin-top: 20px;
+  font-size: 18px;
+  font-weight: bold;
+}
+.total span { color: red; }
+.proceed-btn {
+  margin-top: 20px;
+  background: #d32f2f;
+  border: none;
+  color: white;
+  padding: 12px 20px;
+  font-size: 16px;
+  border-radius: 5px;
+  cursor: pointer;
+  width: 100%;
+}
+.proceed-btn:hover { background: #b71c1c; }
+
+.image-center img {
+  max-width: 100%;
+  border-radius: 10px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+}
+
+/* Responsive */
+@media(max-width:600px){
+  .match-card .teams {
+    flex-direction: column;
+    gap: 10px;
+  }
+  .match-card .vs { font-size: 24px; margin: 5px 0; }
+  .seat-type { flex: 1 1 80%; font-size: 14px; padding:12px;}
+}
+</style>
+</head>
+<body>
+
+<!-- Match Details Section -->
+<div class="match-card" id="details"></div>
+
+<!-- Seat Map Chart -->
+<div class="seat-map" id="seatMap"></div>
+
+<!-- Booking Summary -->
+<div class="box">
+<h2>Booking Summary</h2>
+<div class="description" id="descBox"></div>
+
+<div class="price"><strong>Price per Ticket:</strong> ₹<span id="ticketPrice">0</span></div>
+
+<div class="qty">
+  <strong>Quantity:</strong>
+  <button onclick="changeQty(-1)">-</button>
+  <input type="text" id="qty" value="1" readonly>
+  <button onclick="changeQty(1)">+</button>
+</div>
+
+<div class="total">Total: ₹ <span id="total">0</span></div>
+
+<button class="proceed-btn" onclick="goToPayment()">Proceed to Booking</button>
+</div>
+
+<script>
+let selectedSeat = null;
+let price = 0;
+
+// Load match data from localStorage
+const match = JSON.parse(localStorage.getItem("selectedMatch"));
+if(match){
+  document.getElementById("details").innerHTML = `
+    <h2 style="text-align:center;">${match.teams}</h2>
+    <p style="text-align:center;"><strong>Date:</strong> ${match.date} &nbsp; | &nbsp; <strong>Time:</strong> ${match.time || '—'}</p>
+    <p style="text-align:center;"><strong>Stadium:</strong> ${match.stadium}</p>
+    <div class="teams">
+      <img src="${match.img1}" alt="Team 1">
+      <div class="vs">VS</div>
+      <img src="${match.img2}" alt="Team 2">
+    </div>
+  `;
+}else{
+  document.getElementById("details").innerText = "No match preview found.";
+}
+
+// Seat types
+const seatTypes = [
+  {name:"General Stand",price:1000,desc:"Affordable seating, usually in the upper stands.",class:"general"},
+  {name:"Premium Stand",price:1500,desc:"Better view, closer to the field.",class:"premium"},
+  {name:"Pavilion Stand",price:3500,desc:"Good view near pitch.",class:"pavilion"},
+  {name:"VIP Stand",price:6000,desc:"Exclusive VIP access.",class:"vip"},
+  {name:"Corporate Box",price:8000,desc:"Luxury private box.",class:"corporate"},
+  {name:"Hospitality Box",price:10000,desc:"High-end hospitality and lounge.",class:"hospitality"},
+  {name:"Skybox/Lounge",price:16000,desc:"Topmost premium view with food & drinks.",class:"skybox"}
+];
+
+// Render seat map
+const seatMap = document.getElementById("seatMap");
+seatTypes.forEach(seat=>{
+  const div = document.createElement("div");
+  div.className = `seat-type ${seat.class}`;
+  div.innerText = seat.name;
+  div.dataset.price = seat.price;
+  div.dataset.desc = seat.desc;
+  div.addEventListener('click', ()=>{
+    document.querySelectorAll('.seat-type').forEach(s=>s.classList.remove('active'));
+    div.classList.add('active');
+    selectedSeat = seat.name;
+    price = seat.price;
+    document.getElementById('ticketPrice').innerText = price;
+    document.getElementById('descBox').innerText = `${selectedSeat} – ${seat.desc}`;
+    document.getElementById('descBox').style.display = 'block';
+    updateTotal();
+  });
+  seatMap.appendChild(div);
+});
+
+function changeQty(val){
+  let qty = parseInt(document.getElementById('qty').value);
+  qty = Math.max(1, qty + val);
+  document.getElementById('qty').value = qty;
+  updateTotal();
+}
+
+function updateTotal(){
+  const qty = parseInt(document.getElementById('qty').value);
+  document.getElementById('total').innerText = price * qty;
+}
+
+function goToPayment(){
+  const qty = parseInt(document.getElementById('qty').value);
+  if(!selectedSeat || price === 0){
+    alert("Please select a ticket type.");
+    return;
+  }
+  const paymentData = {
+    seatType: selectedSeat,
+    price,
+    qty,
+    total: price * qty,
+    matchDetails: match
+  };
+  localStorage.setItem("paymentInfo", JSON.stringify(paymentData));
+  window.location.href = "payment.html"; // next page
+}
+</script>
+
+</body>
+</html>
