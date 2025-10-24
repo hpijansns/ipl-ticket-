@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Booking Summary</title>
 <style>
+/* ... (CSS code remains exactly the same) ... */
 body {
   font-family: Arial, sans-serif;
   background: #f4f7fa;
@@ -227,8 +228,9 @@ function goToPayment(){
     matchDetails: match
   };
   localStorage.setItem("paymentInfo", JSON.stringify(paymentData));
-  alert("अब आपको payment.html पेज पर रीडायरेक्ट किया जाएगा।\nTotal: ₹" + (price * qty));
-  // window.location.href = "payment.html"; // जब आप payment.html बना लेंगे, तो इसे अनकमेंट करें
+  
+  // ALERT हटाया गया और सीधा रीडायरेक्ट सक्षम किया गया
+  window.location.href = "payment.html"; 
 }
 </script>
 </body>
