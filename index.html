@@ -141,7 +141,7 @@ footer a:hover{text-decoration:underline;}
 const banner = localStorage.getItem('bannerURL') || "https://iili.io/K8L5Ots.jpg";
 document.getElementById('banner-img').src = banner;
 
-// Matches data
+// Matches data (added 2 extra matches)
 const matches = JSON.parse(localStorage.getItem('iplMatches')) || [
     {
       teams:"Mumbai Indians vs Chennai Super Kings",
@@ -156,6 +156,22 @@ const matches = JSON.parse(localStorage.getItem('iplMatches')) || [
       date:"2025-04-06",
       time:"19:30",
       stadium:"M Chinnaswamy Stadium",
+      img1:"https://iili.io/K8L5Ots.jpg",
+      img2:"https://iili.io/K8L5Ots.jpg"
+    },
+    {
+      teams:"Delhi Capitals vs Punjab Kings",
+      date:"2025-04-07",
+      time:"19:30",
+      stadium:"Arun Jaitley Stadium",
+      img1:"https://iili.io/K8L5Ots.jpg",
+      img2:"https://iili.io/K8L5Ots.jpg"
+    },
+    {
+      teams:"Sunrisers Hyderabad vs Lucknow Super Giants",
+      date:"2025-04-08",
+      time:"19:30",
+      stadium:"Rajiv Gandhi International Stadium",
       img1:"https://iili.io/K8L5Ots.jpg",
       img2:"https://iili.io/K8L5Ots.jpg"
     }
