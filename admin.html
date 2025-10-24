@@ -116,7 +116,6 @@ function renderTable(){
   });
 }
 
-// नया फंक्शन: File या URL से इमेज को preview करना
 function previewImage(input, previewId) {
     const preview = document.getElementById(previewId);
     if (input.type === 'file' && input.files[0]) {
@@ -133,7 +132,6 @@ function previewImage(input, previewId) {
     }
 }
 
-// saveMatch फंक्शन: अब File या URL दोनों को सपोर्ट करता है
 async function saveMatch(e){
   e.preventDefault();
   const teams=document.getElementById("teams").value.trim();
@@ -146,7 +144,6 @@ async function saveMatch(e){
   let img1=editIndex>=0?matches[editIndex].img1:"";
   let img2=editIndex>=0?matches[editIndex].img2:"";
   
-  // Team 1 Logic: URL को प्राथमिकता दें, फिर File को।
   const img1Url = document.getElementById("img1_url").value.trim();
   const img1File = document.getElementById("img1_file").files[0];
 
@@ -156,7 +153,6 @@ async function saveMatch(e){
     try {img1=await toBase64(img1File);} catch (error) {console.error("Error converting img1:", error);}
   }
   
-  // Team 2 Logic: URL को प्राथमिकता दें, फिर File को।
   const img2Url = document.getElementById("img2_url").value.trim();
   const img2File = document.getElementById("img2_file").files[0];
 
@@ -173,11 +169,8 @@ async function saveMatch(e){
   localStorage.setItem("iplMatches",JSON.stringify(matches)); 
   renderTable();
   document.getElementById("matchForm").reset();
-  
-  // Preview images को reset करना
   document.getElementById("preview1").style.display="none";
   document.getElementById("preview2").style.display="none";
-  
   alert("Match saved successfully! Refresh the index.html page to see changes.");
 }
 
@@ -189,8 +182,7 @@ function editMatch(index){
   document.getElementById("time").value=m.time;
   document.getElementById("stadium").value=m.stadium;
   
-  // Edit करते समय URL या Base64 को वापस इनपुट में नहीं भरा जा सकता,
-  // लेकिन preview में दिखाया जा सकता है। File और URL इनपुट खाली रहेंगे।
+  // URL इनपुट को प्रीफ़िल करना
   document.getElementById("img1_url").value = m.img1.startsWith('http') ? m.img1 : '';
   document.getElementById("img2_url").value = m.img2.startsWith('http') ? m.img2 : '';
 
@@ -209,7 +201,7 @@ function deleteMatch(index){
   }
 }
 
-// Banner Logic (कोई बदलाव नहीं)
+// Banner Logic
 const bannerInput=document.getElementById("bannerInput");
 const bannerPreview=document.getElementById("bannerPreview");
 
@@ -234,7 +226,6 @@ document.getElementById("bannerForm").addEventListener("submit",e=>{
   } else {alert("Select an image first.");}
 });
 
-// URL input के चेंज पर भी preview दिखाने के लिए event listeners
 document.getElementById("img1_url").addEventListener("input", function() { previewImage(this, 'preview1'); });
 document.getElementById("img2_url").addEventListener("input", function() { previewImage(this, 'preview2'); });
 
