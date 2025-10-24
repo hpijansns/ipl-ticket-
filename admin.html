@@ -211,7 +211,18 @@ button.delete:hover {
 <script>
 const ADMIN_USER = "7627055204", ADMIN_PASS = "Pooja2005";
 let editIndex = -1;
-let matches = JSON.parse(localStorage.getItem("iplMatches")) || [];
+
+// Default sample match with photos
+let matches = JSON.parse(localStorage.getItem("iplMatches")) || [
+  {
+    teams: "India vs Australia",
+    date: "2025-10-30",
+    time: "19:30",
+    stadium: "Wankhede Stadium, Mumbai",
+    img1: "https://upload.wikimedia.org/wikipedia/en/4/41/Flag_of_India.svg",
+    img2: "https://upload.wikimedia.org/wikipedia/en/8/88/Flag_of_Australia_%28converted%29.svg"
+  }
+];
 
 function login() {
   const u = document.getElementById("username").value.trim();
