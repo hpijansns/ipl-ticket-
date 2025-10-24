@@ -1,272 +1,222 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="hi">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Booking Summary</title>
-<script src="right_click.js"></script>
 <style>
 body {
   font-family: Arial, sans-serif;
-  background: #f9f9f9;
+  background: #f4f7fa;
   margin: 0;
-  padding: 20px;
+  padding: 15px;
   display: flex;
   flex-direction: column;
   align-items: center;
   gap: 20px;
 }
-
 .match-card, .box, .seat-map {
   background: white;
-  padding: 25px;
+  padding: 20px;
   border-radius: 10px;
   box-shadow: 0 4px 12px rgba(0,0,0,0.1);
   max-width: 500px;
   width: 100%;
-  box-sizing: border-box;
 }
-
 h2 {
-  margin-bottom: 20px;
+  text-align: center;
+  margin-bottom: 10px;
   font-size: 22px;
+  color: #222;
 }
-
-/* Match Details */
 .match-card img {
-  max-width: 100%;
+  width: 100%;
   border-radius: 10px;
-  box-shadow: 0 4px 10px rgba(0,0,0,0.1);
 }
-
-.match-card .teams {
+.teams {
   display: flex;
   justify-content: center;
   align-items: center;
-  gap: 20px;
+  gap: 15px;
   margin-top: 10px;
 }
-
-.match-card .teams img {
-  width: 120px;
-  height: 120px;
+.teams img {
+  width: 100px;
+  height: 100px;
   object-fit: contain;
-  border-radius: 8px;
+  border-radius: 10px;
 }
-
-.match-card .vs {
-  font-size: 32px;
-  font-weight: 700;
+.vs {
+  font-size: 24px;
+  font-weight: bold;
   color: #f84464;
 }
-
-/* Seat Map */
 .seat-map {
   display: flex;
   flex-wrap: wrap;
   justify-content: center;
-  gap: 12px;
-  margin-bottom: 20px;
+  gap: 10px;
 }
-
 .seat-type {
-  flex: 1 1 40%;
-  padding: 15px;
+  flex: 1 1 45%;
   text-align: center;
-  color: #fff;
+  padding: 12px;
+  border-radius: 6px;
+  color: white;
   font-weight: bold;
-  border-radius: 8px;
   cursor: pointer;
   transition: 0.3s;
 }
-
 .seat-type.active {
-  outline: 4px solid #000;
+  outline: 3px solid #000;
   transform: scale(1.05);
 }
-
-/* Color-coded seat types */
-.general {background:#6EC6FF;}
-.premium {background:#81C784;}
-.pavilion {background:#FFF176;color:#000;}
-.vip {background:#FFB74D;color:#000;}
-.corporate {background:#E57373;}
-.hospitality {background:#F06292;}
-.skybox {background:#3949AB;}
-
-/* Booking Summary */
+.general {background:#42a5f5;}
+.premium {background:#66bb6a;}
+.pavilion {background:#ffee58; color:#000;}
+.vip {background:#ff7043;}
+.corporate {background:#e57373;}
+.hospitality {background:#ba68c8;}
+.skybox {background:#3949ab;}
 .description {
-  margin: 10px 0;
+  background: #e3f2fd;
+  border: 1px solid #64b5f6;
   padding: 10px;
-  background: #e3f0ff;
-  border: 1px solid #4285f4;
-  border-radius: 5px;
+  margin: 10px 0;
   display: none;
+  border-radius: 6px;
 }
-
-.price, .qty {
-  margin-top: 15px;
+.qty {
+  margin-top: 10px;
 }
-
+.qty button {
+  padding: 6px 10px;
+  font-size: 16px;
+}
 .qty input {
   width: 40px;
   text-align: center;
   font-size: 16px;
 }
-
-.qty button {
-  padding: 5px 10px;
-  font-size: 16px;
-  cursor: pointer;
-}
-
 .total {
-  margin-top: 20px;
+  margin-top: 10px;
   font-size: 18px;
   font-weight: bold;
+  color: #222;
 }
-
-.total span { color: red; }
-
+.total span { color: #e53935; }
 .proceed-btn {
-  margin-top: 20px;
-  background: #d32f2f;
-  border: none;
-  color: white;
-  padding: 12px 20px;
-  font-size: 16px;
-  border-radius: 5px;
-  cursor: pointer;
   width: 100%;
+  background: #d32f2f;
+  color: white;
+  border: none;
+  padding: 12px;
+  font-size: 16px;
+  border-radius: 6px;
+  cursor: pointer;
 }
-
 .proceed-btn:hover { background: #b71c1c; }
-
-.image-center img {
-  max-width: 100%;
-  border-radius: 10px;
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-}
-
-/* Responsive */
 @media(max-width:600px){
-  .match-card .teams {
-    flex-direction: column;
-    gap: 10px;
-  }
-  .match-card .vs { font-size: 24px; margin: 5px 0; }
-  .seat-type { flex: 1 1 80%; font-size: 14px; padding:12px;}
+  .teams {flex-direction: column;}
+  .seat-type {flex: 1 1 80%;}
 }
 </style>
 </head>
 <body>
 
-<!-- Match Details Section -->
 <div class="match-card" id="details"></div>
-
-<!-- Seat Map Chart -->
 <div class="seat-map" id="seatMap"></div>
 
-<!-- Booking Summary -->
 <div class="box">
   <h2>Booking Summary</h2>
-  <div class="description" id="descBox"></div>
-
-  <div class="price"><strong>Price per Ticket:</strong> ₹<span id="ticketPrice">0</span></div>
+  <div id="descBox" class="description"></div>
+  <div><strong>Price per Ticket:</strong> ₹<span id="ticketPrice">0</span></div>
 
   <div class="qty">
     <strong>Quantity:</strong>
     <button onclick="changeQty(-1)">-</button>
-    <input type="text" id="qty" value="1" readonly>
+    <input id="qty" value="1" readonly>
     <button onclick="changeQty(1)">+</button>
   </div>
 
   <div class="total">Total: ₹ <span id="total">0</span></div>
 
-  <button class="proceed-btn" onclick="goToPayment()">Proceed to Booking</button>
+  <button class="proceed-btn" onclick="goToPayment()">Pay Now</button>
 </div>
 
 <script>
 let selectedSeat = null;
 let price = 0;
 
-// Load match data from localStorage
-const match = JSON.parse(localStorage.getItem("selectedMatch"));
+// Dummy match for testing (if no data found)
+const match = JSON.parse(localStorage.getItem("selectedMatch")) || {
+  teams: "CSK vs MI",
+  date: "2025-10-25",
+  time: "7:30 PM",
+  stadium: "Wankhede Stadium, Mumbai",
+  img1: "https://upload.wikimedia.org/wikipedia/en/2/2f/Chennai_Super_Kings_Logo.svg",
+  img2: "https://upload.wikimedia.org/wikipedia/en/2/25/Mumbai_Indians_Logo.svg"
+};
 
-if(match){
-  document.getElementById("details").innerHTML = `
-    <h2 style="text-align:center;">${match.teams}</h2>
-    <p style="text-align:center;"><strong>Date:</strong> ${match.date} &nbsp; | &nbsp; <strong>Time:</strong> ${match.time || '—'}</p>
-    <p style="text-align:center;"><strong>Stadium:</strong> ${match.stadium}</p>
-    <div class="teams">
-      <img src="${match.img1}" alt="Team 1">
-      <div class="vs">VS</div>
-      <img src="${match.img2}" alt="Team 2">
-    </div>
-  `;
-}else{
-  document.getElementById("details").innerText = "No match preview found.";
-}
+document.getElementById("details").innerHTML = `
+  <h2>${match.teams}</h2>
+  <p style="text-align:center;"><strong>Date:</strong> ${match.date} | <strong>Time:</strong> ${match.time}</p>
+  <p style="text-align:center;"><strong>Stadium:</strong> ${match.stadium}</p>
+  <div class="teams">
+    <img src="${match.img1}" alt="Team 1">
+    <div class="vs">VS</div>
+    <img src="${match.img2}" alt="Team 2">
+  </div>
+`;
 
 // Seat types
 const seatTypes = [
-  {name:"General Stand",price:1000,desc:"Affordable seating, usually in the upper stands.",class:"general"},
-  {name:"Premium Stand",price:1500,desc:"Better view, closer to the field.",class:"premium"},
-  {name:"Pavilion Stand",price:3500,desc:"Good view near pitch.",class:"pavilion"},
-  {name:"VIP Stand",price:6000,desc:"Exclusive VIP access.",class:"vip"},
-  {name:"Corporate Box",price:8000,desc:"Luxury private box.",class:"corporate"},
-  {name:"Hospitality Box",price:10000,desc:"High-end hospitality and lounge.",class:"hospitality"},
-  {name:"Skybox/Lounge",price:16000,desc:"Topmost premium view with food & drinks.",class:"skybox"}
+  {name:"General Stand",price:1000,desc:"Affordable seating in upper stands.",class:"general"},
+  {name:"Premium Stand",price:1500,desc:"Better view, closer to field.",class:"premium"},
+  {name:"Pavilion",price:3500,desc:"Good view near pitch.",class:"pavilion"},
+  {name:"VIP",price:6000,desc:"Exclusive VIP area.",class:"vip"},
+  {name:"Corporate Box",price:8000,desc:"Private luxury box.",class:"corporate"},
+  {name:"Hospitality Box",price:10000,desc:"Lounge + meals included.",class:"hospitality"},
+  {name:"Skybox",price:16000,desc:"Top premium view with food & drinks.",class:"skybox"}
 ];
 
-// Render seat map
 const seatMap = document.getElementById("seatMap");
 seatTypes.forEach(seat=>{
   const div = document.createElement("div");
   div.className = `seat-type ${seat.class}`;
   div.innerText = seat.name;
-  div.dataset.price = seat.price;
-  div.dataset.desc = seat.desc;
-  div.addEventListener('click', ()=>{
-    document.querySelectorAll('.seat-type').forEach(s=>s.classList.remove('active'));
-    div.classList.add('active');
+  div.onclick = () => {
+    document.querySelectorAll(".seat-type").forEach(s=>s.classList.remove("active"));
+    div.classList.add("active");
     selectedSeat = seat.name;
     price = seat.price;
-    document.getElementById('ticketPrice').innerText = price;
-    document.getElementById('descBox').innerText = `${selectedSeat} – ${seat.desc}`;
-    document.getElementById('descBox').style.display = 'block';
+    document.getElementById("ticketPrice").innerText = price;
+    document.getElementById("descBox").style.display = "block";
+    document.getElementById("descBox").innerText = `${seat.name}: ${seat.desc}`;
     updateTotal();
-  });
+  };
   seatMap.appendChild(div);
 });
-
-// Auto-select first seat
 seatMap.firstChild.click();
 
 function changeQty(val){
-  let qty = parseInt(document.getElementById('qty').value);
+  let qty = parseInt(document.getElementById("qty").value);
   qty = Math.max(1, qty + val);
-  document.getElementById('qty').value = qty;
+  document.getElementById("qty").value = qty;
   updateTotal();
 }
 
 function updateTotal(){
-  const qty = parseInt(document.getElementById('qty').value);
-  document.getElementById('total').innerText = price * qty;
+  const qty = parseInt(document.getElementById("qty").value);
+  document.getElementById("total").innerText = price * qty;
 }
 
 function goToPayment(){
-  if(!match){
-    alert("No match selected. Please select a match first.");
-    return;
-  }
-
-  const qty = parseInt(document.getElementById('qty').value);
   if(!selectedSeat || price === 0){
-    alert("Please select a ticket type.");
+    alert("कृपया सीट प्रकार चुनें!");
     return;
   }
-
+  const qty = parseInt(document.getElementById("qty").value);
   const paymentData = {
     seatType: selectedSeat,
     price,
@@ -274,11 +224,10 @@ function goToPayment(){
     total: price * qty,
     matchDetails: match
   };
-
   localStorage.setItem("paymentInfo", JSON.stringify(paymentData));
-  window.location.href = "payment.html"; // redirect to payment page
+  alert("Redirecting to payment page...");
+  window.location.href = "payment.html";
 }
 </script>
-
 </body>
 </html>
