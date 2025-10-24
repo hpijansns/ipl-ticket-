@@ -147,15 +147,15 @@ h2 {
 <script>
 let selectedSeat = null;
 let price = 0;
+const defaultImg = "https://iili.io/K8L5Ots.jpg";
 
-// Dummy match for testing (if no data found)
 const match = JSON.parse(localStorage.getItem("selectedMatch")) || {
-  teams: "CSK vs MI",
-  date: "2025-10-25",
-  time: "7:30 PM",
-  stadium: "Wankhede Stadium, Mumbai",
-  img1: "https://upload.wikimedia.org/wikipedia/en/2/2f/Chennai_Super_Kings_Logo.svg",
-  img2: "https://upload.wikimedia.org/wikipedia/en/2/25/Mumbai_Indians_Logo.svg"
+  teams: "Demo Match",
+  date: "2025-01-01",
+  time: "7:00 PM",
+  stadium: "Demo Stadium",
+  img1: defaultImg,
+  img2: defaultImg
 };
 
 document.getElementById("details").innerHTML = `
@@ -163,9 +163,9 @@ document.getElementById("details").innerHTML = `
   <p style="text-align:center;"><strong>Date:</strong> ${match.date} | <strong>Time:</strong> ${match.time}</p>
   <p style="text-align:center;"><strong>Stadium:</strong> ${match.stadium}</p>
   <div class="teams">
-    <img src="${match.img1}" alt="Team 1">
+    <img src="${match.img1 || defaultImg}" alt="Team 1">
     <div class="vs">VS</div>
-    <img src="${match.img2}" alt="Team 2">
+    <img src="${match.img2 || defaultImg}" alt="Team 2">
   </div>
 `;
 
@@ -197,6 +197,8 @@ seatTypes.forEach(seat=>{
   };
   seatMap.appendChild(div);
 });
+
+// Default selection on load
 seatMap.firstChild.click();
 
 function changeQty(val){
@@ -225,8 +227,8 @@ function goToPayment(){
     matchDetails: match
   };
   localStorage.setItem("paymentInfo", JSON.stringify(paymentData));
-  alert("Redirecting to payment page...");
-  window.location.href = "payment.html";
+  alert("अब आपको payment.html पेज पर रीडायरेक्ट किया जाएगा।\nTotal: ₹" + (price * qty));
+  // window.location.href = "payment.html"; // जब आप payment.html बना लेंगे, तो इसे अनकमेंट करें
 }
 </script>
 </body>
