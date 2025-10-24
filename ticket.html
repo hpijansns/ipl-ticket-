@@ -107,7 +107,7 @@ body {
     <div class="center">
       <div class="small-logos">
         <div class="box"><img id="iplLogo" src="https://upload.wikimedia.org/wikipedia/commons/3/3a/Indian_Premier_League_logo.svg" alt="IPL"></div>
-        <div class="box"><img id="srhSmall" src="" alt="Opponent Logo"></div>
+        <div class="box"><img id="oppSmallLogo" src="" alt="Opponent Logo"></div>
       </div>
       <div class="matchno" id="matchNo"></div>
       <div class="teams" id="teamsText"></div>
@@ -128,58 +128,104 @@ body {
   <div class="bottom">
     <div class="cell"><small>ENTRY FROM</small><span id="entryFrom"></span></div>
     <div class="cell"><small>STAIRCASE</small><span id="staircase"></span></div>
-    <div class="cell"><small>SEAT</small><span id="seat"></span></div>
+    <div class="cell"><small>BLOCK/SEAT</small><span id="seat"></span></div>
     <div class="cell"><small>GATE</small><span id="gate"></span></div>
   </div>
 </div>
 
-<!-- Download Button Outside Ticket -->
 <button id="downloadBtn">Download Ticket</button>
 
 <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
 <script>
+// Default logo for safety
+const DEFAULT_LOGO = "https://iili.io/K8L5Ots.jpg";
+
 // Fetch ticket data
 const ticketData = JSON.parse(localStorage.getItem('finalTicket'));
-if(!ticketData){
-  alert("No ticket data found! Please pay first.");
-  window.location.href="seat.html";
+
+if(!ticketData || !ticketData.matchDetails){
+  alert("❌ Ticket data not found! Please ensure payment was completed.");
+  // Redirect to home if data is missing
+  window.location.href="index.html"; 
 }
 
-// Populate ticket
+const match = ticketData.matchDetails;
+const teamsArray = match.teams.split(' vs ');
+const team1Name = teamsArray[0] || 'Team 1';
+const team2Name = teamsArray[1] || 'Team 2';
+// UTR और Booking ID से एक यूनिक ID बनाना
+const uniqueTicketId = (ticketData.bookingId || 'IPL0000') + (ticketData.utr ? ticketData.utr.slice(-4) : '0000');
+
+
+// --- Ticket Population ---
+
+// 1. Header Metadata
 document.getElementById('totalPrice').textContent = ticketData.total;
 document.getElementById('totalPrice2').textContent = ticketData.total;
+document.getElementById('sr-left').textContent = uniqueTicketId;
+document.getElementById('sr-right').textContent = uniqueTicketId;
+document.getElementById('roll-left').textContent = ticketData.qty;
+document.getElementById('roll-right').textContent = ticketData.qty;
+document.getElementById('code-left').textContent = ticketData.seatType.substring(0, 3).toUpperCase() + '-' + ticketData.qty;
+document.getElementById('code-right').textContent = ticketData.seatType.substring(0, 3).toUpperCase() + '-' + ticketData.qty;
 
-document.getElementById('leftLogo').src = ticketData.match.teamLogo || '';
-document.getElementById('leftTeam').textContent = ticketData.match.teamName || ticketData.match.teams.split(' vs ')[0];
-document.getElementById('srhSmall').src = ticketData.match.opponentLogo || '';
-document.getElementById('matchNo').textContent = ticketData.match.matchNo || 'Match No. 1';
-document.getElementById('teamsText').textContent = ticketData.match.teams || '';
-document.getElementById('dateText').textContent = ticketData.match.date || '';
-document.getElementById('stadText').textContent = ticketData.match.stadium || '';
-document.getElementById('gateGhost').textContent = ticketData.gate || '1';
-document.getElementById('miniLogo').src = ticketData.match.teamLogo || '';
-document.getElementById('miniText').textContent = ticketData.match.teams || '';
-document.getElementById('entryFrom').textContent = ticketData.entry || 'Main Entrance';
-document.getElementById('staircase').textContent = ticketData.staircase || '1';
-document.getElementById('seat').textContent = ticketData.seats ? ticketData.seats.join(', ') : '';
-document.getElementById('gate').textContent = ticketData.gate || '1';
 
-// Download functionality
+// 2. Main Center Content
+// Logos (img1/img2 from matchDetails)
+document.getElementById('leftLogo').src = match.img1 || DEFAULT_LOGO;
+document.getElementById('leftTeam').textContent = team1Name;
+document.getElementById('oppSmallLogo').src = match.img2 || DEFAULT_LOGO;
+document.getElementById('matchNo').textContent = 'TICKET FOR: ' + ticketData.seatType.toUpperCase();
+document.getElementById('teamsText').textContent = match.teams;
+document.getElementById('dateText').textContent = `${match.date} | ${match.time || '—'}`;
+document.getElementById('stadText').textContent = match.stadium;
+document.getElementById('miniLogo').src = match.img1 || DEFAULT_LOGO;
+document.getElementById('miniText').textContent = team1Name + ' vs ' + team2Name;
+
+
+// 3. Bottom Band (Randomized/Dummy Data for Seat/Gate)
+const GATE = (Math.floor(Math.random() * 5) + 1).toString();
+const STAIRCASE = (Math.floor(Math.random() * 8) + 1).toString();
+const SEAT_NO = Math.floor(Math.random() * 50) + 1;
+const BLOCK_LETTER = String.fromCharCode(65 + Math.floor(Math.random() * 5)); // A, B, C, D, E
+
+document.getElementById('gateGhost').textContent = GATE;
+document.getElementById('entryFrom').textContent = 'GATE ' + GATE;
+document.getElementById('staircase').textContent = STAIRCASE;
+document.getElementById('seat').textContent = `${BLOCK_LETTER} / ${SEAT_NO}`; // Block/Seat No
+document.getElementById('gate').textContent = GATE;
+
+
+// --- Download Functionality ---
+
 document.getElementById('downloadBtn').addEventListener('click', () => {
     confetti({ particleCount: 150, spread: 70, origin: { y: 0.6 } });
+    
+    // html2canvas के लोड होने का इंतज़ार करें
+    if (typeof html2canvas === 'undefined') {
+        alert("Please wait a moment while the download tools load.");
+        return;
+    }
+    
     alert("🎉 Congratulations! Your ticket is ready to download.");
-    html2canvas(document.getElementById('ticket')).then(canvas=>{
+    
+    // Ticket div को canvas में बदलना
+    html2canvas(document.getElementById('ticket'), { scale: 2 }).then(canvas => {
         const link = document.createElement('a');
         link.href = canvas.toDataURL('image/png');
-        link.download = 'IPL_Ticket.png';
+        link.download = `IPL_Ticket_${uniqueTicketId}.png`;
         link.click();
     });
 });
 
-// Load html2canvas
+// Load html2canvas script
 const script = document.createElement('script');
 script.src = "https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js";
-document.body.appendChild(script);
+document.head.appendChild(script);
+
+// Ensure the seat label is correct for the ticket layout
+document.querySelector('#seat').previousElementSibling.innerHTML = 'BLOCK/SEAT';
+
 </script>
 
 </body>
