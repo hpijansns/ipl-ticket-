@@ -26,23 +26,39 @@ body {
   text-align:center;
   border-top:6px solid #0b81d1;
 }
-.payment-box h2 {font-size:28px;margin-bottom:20px;color:#000;font-weight:700;}
-.match-info {text-align:center;margin-bottom:20px;}
-.match-info img {max-width:100px;border-radius:10px;margin:5px;}
-.seats-list {display:flex;flex-wrap:wrap;justify-content:center;list-style:none;padding:0;margin:10px 0 20px 0;}
-.seats-list li {background:#0b81d1;color:#fff;padding:8px 12px;margin:5px;border-radius:8px;font-weight:500;}
-.total-amount {font-size:20px;font-weight:700;margin-bottom:15px;}
+.payment-box h2 {font-size:26px;margin-bottom:15px;color:#000;font-weight:700;}
+.match-info {text-align:center;margin-bottom:20px;line-height:1.6;}
+.match-info img {max-width:90px;border-radius:10px;margin:5px;}
+.total-amount {font-size:20px;font-weight:700;margin:15px 0;}
 .qr-container {margin:20px 0;display:inline-block;padding:15px;border:2px dashed #0b81d1;border-radius:15px;background:#f9f9f9;}
 .qr-container img {width:200px;height:200px;}
-input#utrInput {padding:12px;font-size:16px;width:90%;max-width:260px;border-radius:8px;border:1px solid #ccc;margin-top:15px;text-align:center;}
+input#utrInput {
+  padding:12px;
+  font-size:16px;
+  width:90%;
+  max-width:260px;
+  border-radius:8px;
+  border:1px solid #ccc;
+  margin-top:15px;
+  text-align:center;
+}
 button#payWithUTR {
-  padding:14px 25px;font-size:16px;font-weight:700;border:none;border-radius:10px;cursor:pointer;color:#fff;
-  background:linear-gradient(90deg,#4caf50,#43a047);margin-top:20px;transition:0.3s;
+  padding:14px 25px;
+  font-size:16px;
+  font-weight:700;
+  border:none;
+  border-radius:10px;
+  cursor:pointer;
+  color:#fff;
+  background:linear-gradient(90deg,#4caf50,#43a047);
+  margin-top:20px;
+  transition:0.3s;
 }
 button#payWithUTR:hover {background:linear-gradient(90deg,#43a047,#388e3c);}
 @media(max-width:600px){
-  input#utrInput {width:90%;}
+  .payment-box {padding:20px;}
   .qr-container img {width:150px;height:150px;}
+  .payment-box h2 {font-size:22px;}
 }
 </style>
 </head>
@@ -54,16 +70,13 @@ button#payWithUTR:hover {background:linear-gradient(90deg,#43a047,#388e3c);}
 
 <div class="match-info" id="matchInfo"></div>
 
-<h3>Seats Selected</h3>
-<ul class="seats-list" id="seatList"></ul>
-
 <p class="total-amount" id="totalAmount"></p>
 
 <div class="qr-container">
 <img src="https://iili.io/K8pC8WG.png" alt="Scan to Pay QR">
 </div>
 
-<p>Enter Transaction ID after payment:</p>
+<p>भुगतान करने के बाद Transaction ID दर्ज करें:</p>
 <input type="text" id="utrInput" placeholder="Enter 12-digit UTR">
 
 <br>
@@ -72,7 +85,7 @@ button#payWithUTR:hover {background:linear-gradient(90deg,#43a047,#388e3c);}
 </div>
 
 <script>
-// Example / Demo Data
+// Demo data if nothing in localStorage
 if(!localStorage.getItem('paymentInfo')){
     localStorage.setItem('paymentInfo', JSON.stringify({
         matchDetails: {
@@ -83,57 +96,50 @@ if(!localStorage.getItem('paymentInfo')){
             img1: "https://iili.io/K8L5Ots.jpg",
             img2: "https://iili.io/K8L5Ots.jpg"
         },
-        seats: ["S1","S2","S3"],
-        total: 1500
+        seatType: "Premium Stand",
+        price: 1500,
+        qty: 2,
+        total: 3000
     }));
 }
 
-// Get ticket data from localStorage
+// Get ticket data
 const ticketData = JSON.parse(localStorage.getItem('paymentInfo'));
 if(!ticketData){ 
-  alert("No data found! Please select your seats again.");
+  alert("❌ कोई डेटा नहीं मिला, कृपया फिर से मैच बुक करें।");
   window.location.href="match-details.html";
 }
 
 // Show match info
 document.getElementById('matchInfo').innerHTML = `
   <strong>${ticketData.matchDetails.teams}</strong><br>
-  ${ticketData.matchDetails.date} | ${ticketData.matchDetails.time || '—'} | ${ticketData.matchDetails.stadium}
-  <br><img src="${ticketData.matchDetails.img1}" alt="Team 1">
+  ${ticketData.matchDetails.date} | ${ticketData.matchDetails.time || '—'}<br>
+  ${ticketData.matchDetails.stadium}<br>
+  <img src="${ticketData.matchDetails.img1}" alt="Team 1">
   <img src="${ticketData.matchDetails.img2}" alt="Team 2">
+  <br><br>
+  <strong>Seat Type:</strong> ${ticketData.seatType} <br>
+  <strong>Quantity:</strong> ${ticketData.qty}
 `;
-
-// Show selected seats
-const seatList = document.getElementById('seatList');
-seatList.innerHTML = "";
-ticketData.seats.forEach(seat=>{
-  const li = document.createElement('li');
-  li.textContent = seat;
-  seatList.appendChild(li);
-});
 
 // Show total amount
 document.getElementById('totalAmount').textContent = `Total Amount: ₹${ticketData.total}`;
 
-// Pay button click
+// Handle payment button
 document.getElementById('payWithUTR').addEventListener('click', ()=>{
-    const transactionID = document.getElementById('utrInput').value.trim();
-
-    // Validate 12-digit UTR
+    const utr = document.getElementById('utrInput').value.trim();
     const utrRegex = /^\d{12}$/;
     const invalidSeqs = ['123456789012','111111111111','000000000000','112233445566'];
 
-    if(!utrRegex.test(transactionID) || invalidSeqs.includes(transactionID)){
-        alert("❌ Invalid Transaction ID! Please enter a valid 12-digit UTR.");
+    if(!utrRegex.test(utr) || invalidSeqs.includes(utr)){
+        alert("❌ कृपया मान्य 12 अंकों का UTR दर्ज करें।");
         return;
     }
 
-    // Save UTR with ticket data
-    ticketData.utr = transactionID;
+    ticketData.utr = utr;
     localStorage.setItem('finalTicket', JSON.stringify(ticketData));
 
-    // Redirect to ticket page
-    alert("✅ Payment Successful! Redirecting to your Ticket...");
+    alert("✅ Payment Successful! Redirecting to Ticket...");
     window.location.href = "ticket.html";
 });
 </script>
