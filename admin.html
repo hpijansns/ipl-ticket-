@@ -5,126 +5,249 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>IPL Admin Panel</title>
 <style>
-body{font-family:sans-serif;margin:0;padding:0;background:#f0f0f0;}
-#loginBox{background:#fff;padding:20px;border-radius:10px;box-shadow:0 5px 15px rgba(0,0,0,0.2);width:90%;max-width:350px;margin:50px auto;text-align:center;}
-#loginBox input{width:100%;padding:10px;margin:10px 0;border-radius:6px;border:1px solid #ccc;}
-#loginBox button{width:100%;padding:11px;background:#f84464;color:#fff;border:none;border-radius:6px;cursor:pointer;font-size:16px;}
-#loginBox button:hover{background:#c4242b;}
+body {
+  font-family: sans-serif;
+  margin: 0;
+  padding: 0;
+  background: #f0f0f0;
+}
+#loginBox {
+  background: #fff;
+  padding: 20px;
+  border-radius: 10px;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+  width: 90%;
+  max-width: 350px;
+  margin: 50px auto;
+  text-align: center;
+}
+#loginBox input {
+  width: 100%;
+  padding: 10px;
+  margin: 10px 0;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+}
+#loginBox button {
+  width: 100%;
+  padding: 11px;
+  background: #f84464;
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 16px;
+}
+#loginBox button:hover {
+  background: #c4242b;
+}
 
-.container{max-width:900px;margin:20px auto;padding:20px;background:#fff;border-radius:10px;box-shadow:0 5px 15px rgba(0,0,0,0.2);}
-header{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;background:#333545;color:#fff;padding:10px;border-radius:10px 10px 0 0;}
-header h3{margin:0;font-size:16px;}
-header button{padding:6px 12px;background:#f84464;color:#fff;border:none;border-radius:5px;cursor:pointer;margin-top:5px;}
-header button:hover{background:#c4242b;}
+.container {
+  max-width: 900px;
+  margin: 20px auto;
+  padding: 20px;
+  background: #fff;
+  border-radius: 10px;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+}
+header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  background: #333545;
+  color: #fff;
+  padding: 10px;
+  border-radius: 10px 10px 0 0;
+}
+header h3 {
+  margin: 0;
+  font-size: 16px;
+}
+header button {
+  padding: 6px 12px;
+  background: #f84464;
+  color: #fff;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  margin-top: 5px;
+}
+header button:hover {
+  background: #c4242b;
+}
 
-form input, form button{padding:10px;margin:5px 0;border-radius:5px;border:1px solid #ccc;font-size:14px;width:100%;box-sizing:border-box;}
-form button{background:#f84464;color:#fff;border:none;cursor:pointer;}
-form button:hover{background:#c4242b;}
+form input, form button {
+  padding: 10px;
+  margin: 5px 0;
+  border-radius: 5px;
+  border: 1px solid #ccc;
+  font-size: 14px;
+  width: 100%;
+  box-sizing: border-box;
+}
+form button {
+  background: #f84464;
+  color: #fff;
+  border: none;
+  cursor: pointer;
+}
+form button:hover {
+  background: #c4242b;
+}
 
-table{width:100%;border-collapse:collapse;margin-top:20px;font-size:12px;}
-th, td{border:1px solid #ccc;padding:8px;text-align:center;}
-img.preview{width:50px;height:50px;object-fit:contain;border-radius:5px;}
-button.edit{background:#4caf50;color:#fff;border:none;padding:5px 10px;border-radius:5px;cursor:pointer;font-size:12px;}
-button.edit:hover{background:#388e3c;}
-button.delete{background:#f44336;color:#fff;border:none;padding:5px 10px;border-radius:5px;cursor:pointer;font-size:12px;}
-button.delete:hover{background:#c4242b;}
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 20px;
+  font-size: 12px;
+}
+th, td {
+  border: 1px solid #ccc;
+  padding: 8px;
+  text-align: center;
+}
+img.preview {
+  width: 50px;
+  height: 50px;
+  object-fit: contain;
+  border-radius: 5px;
+}
+button.edit {
+  background: #4caf50;
+  color: #fff;
+  border: none;
+  padding: 5px 10px;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 12px;
+}
+button.edit:hover {
+  background: #388e3c;
+}
+button.delete {
+  background: #f44336;
+  color: #fff;
+  border: none;
+  padding: 5px 10px;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 12px;
+}
+button.delete:hover {
+  background: #c4242b;
+}
 
 @media(max-width:600px){
-    table, thead, tbody, th, td, tr{display:block;}
-    thead tr{display:none;}
-    td{position:relative;padding-left:50%;margin-bottom:10px;text-align:left;}
-    td:before{position:absolute;top:8px;left:8px;width:45%;white-space:nowrap;font-weight:bold;}
-    td:nth-of-type(1):before{content:"#";}
-    td:nth-of-type(2):before{content:"Teams";}
-    td:nth-of-type(3):before{content:"Date";}
-    td:nth-of-type(4):before{content:"Time";}
-    td:nth-of-type(5):before{content:"Stadium";}
-    td:nth-of-type(6):before{content:"Team1 Img";}
-    td:nth-of-type(7):before{content:"Team2 Img";}
-    td:nth-of-type(8):before{content:"Actions";}
-    img.preview{width:40px;height:40px;}
+  table, thead, tbody, th, td, tr {display:block;}
+  thead tr{display:none;}
+  td{position:relative;padding-left:50%;margin-bottom:10px;text-align:left;}
+  td:before{position:absolute;top:8px;left:8px;width:45%;white-space:nowrap;font-weight:bold;}
+  td:nth-of-type(1):before{content:"#";}
+  td:nth-of-type(2):before{content:"Teams";}
+  td:nth-of-type(3):before{content:"Date";}
+  td:nth-of-type(4):before{content:"Time";}
+  td:nth-of-type(5):before{content:"Stadium";}
+  td:nth-of-type(6):before{content:"Team1 Img";}
+  td:nth-of-type(7):before{content:"Team2 Img";}
+  td:nth-of-type(8):before{content:"Actions";}
+  img.preview{width:40px;height:40px;}
 }
 </style>
 </head>
 <body>
 
+<!-- Login Box -->
 <div id="loginBox">
-<h2>Admin Login</h2>
-<input type="text" id="username" placeholder="Phone / Username">
-<input type="password" id="password" placeholder="Password">
-<button onclick="login()">Login</button>
-<p style="font-size:12px;color:#666;margin-top:10px;">Demo: <strong>7627055204</strong> / <strong>Pooja2005</strong></p>
+  <h2>Admin Login</h2>
+  <input type="text" id="username" placeholder="Phone / Username">
+  <input type="password" id="password" placeholder="Password">
+  <button onclick="login()">Login</button>
+  <p style="font-size:12px;color:#666;margin-top:10px;">
+    Demo: <strong>7627055204</strong> / <strong>Pooja2005</strong>
+  </p>
 </div>
 
+<!-- Dashboard -->
 <div class="container" id="dashboard" style="display:none;">
-<header>
-<h3>Admin Dashboard - <span id="adminUser"></span></h3>
-<button onclick="logout()">Logout</button>
-</header>
+  <header>
+    <h3>Admin Dashboard - <span id="adminUser"></span></h3>
+    <button onclick="logout()">Logout</button>
+  </header>
 
-<h2>Manage Matches</h2>
+  <h2>Manage Matches</h2>
 
-<form id="matchForm">
-<input type="text" id="teams" placeholder="Team1 vs Team2" required>
-<input type="date" id="date" required>
-<input type="time" id="time" required>
-<input type="text" id="stadium" placeholder="Stadium" required>
-<label>Team1 Image:</label>
-<input type="file" id="img1" accept="image/*">
-<label>Team2 Image:</label>
-<input type="file" id="img2" accept="image/*">
-<img id="preview1" class="preview" style="display:none;">
-<img id="preview2" class="preview" style="display:none;">
-<button type="submit">Save Match</button>
-</form>
+  <form id="matchForm">
+    <input type="text" id="teams" placeholder="Team1 vs Team2" required>
+    <input type="date" id="date" required>
+    <input type="time" id="time" required>
+    <input type="text" id="stadium" placeholder="Stadium" required>
+    <label>Team1 Image:</label>
+    <input type="file" id="img1" accept="image/*">
+    <label>Team2 Image:</label>
+    <input type="file" id="img2" accept="image/*">
+    <img id="preview1" class="preview" style="display:none;">
+    <img id="preview2" class="preview" style="display:none;">
+    <button type="submit">Save Match</button>
+  </form>
 
-<table>
-<thead>
-<tr>
-<th>#</th>
-<th>Teams</th>
-<th>Date</th>
-<th>Time</th>
-<th>Stadium</th>
-<th>Team1 Img</th>
-<th>Team2 Img</th>
-<th>Actions</th>
-</tr>
-</thead>
-<tbody id="matchesTable"></tbody>
-</table>
+  <table>
+    <thead>
+      <tr>
+        <th>#</th>
+        <th>Teams</th>
+        <th>Date</th>
+        <th>Time</th>
+        <th>Stadium</th>
+        <th>Team1 Img</th>
+        <th>Team2 Img</th>
+        <th>Actions</th>
+      </tr>
+    </thead>
+    <tbody id="matchesTable"></tbody>
+  </table>
 </div>
 
 <script>
-const ADMIN_USER="7627055204", ADMIN_PASS="Pooja2005";
-let editIndex=-1;
-let matches = JSON.parse(localStorage.getItem('iplMatches')) || [];
+const ADMIN_USER = "7627055204", ADMIN_PASS = "Pooja2005";
+let editIndex = -1;
+let matches = JSON.parse(localStorage.getItem("iplMatches")) || [];
 
-function login(){
-    const u=document.getElementById('username').value.trim();
-    const p=document.getElementById('password').value.trim();
-    if(u===ADMIN_USER && p===ADMIN_PASS){
-        localStorage.setItem('isAdmin','true');
-        localStorage.setItem('adminUser',ADMIN_USER);
-        showDashboard();
-    } else alert("Invalid username or password");
+function login() {
+  const u = document.getElementById("username").value.trim();
+  const p = document.getElementById("password").value.trim();
+  if (u === ADMIN_USER && p === ADMIN_PASS) {
+    localStorage.setItem("isAdmin", "true");
+    localStorage.setItem("adminUser", ADMIN_USER);
+    showDashboard();
+  } else {
+    alert("Invalid username or password");
+  }
 }
 
-function logout(){
-    localStorage.removeItem('isAdmin');
-    localStorage.removeItem('adminUser');
-    document.getElementById('dashboard').style.display="none";
-    document.getElementById('loginBox').style.display="block";
+function logout() {
+  localStorage.removeItem("isAdmin");
+  localStorage.removeItem("adminUser");
+  document.getElementById("dashboard").style.display = "none";
+  document.getElementById("loginBox").style.display = "block";
 }
 
-function toBase64(file){return new Promise((resolve,reject)=>{const reader=new FileReader();reader.onload=()=>resolve(reader.result);reader.onerror=err=>reject(err);reader.readAsDataURL(file);});}
+function toBase64(file) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => resolve(reader.result);
+    reader.onerror = (err) => reject(err);
+    reader.readAsDataURL(file);
+  });
+}
 
-function renderTable(){
-    const tableBody=document.getElementById('matchesTable');
-    tableBody.innerHTML='';
-    matches.forEach((m,i)=>{
-        tableBody.innerHTML+=`<tr>
-        <td>${i+1}</td>
+function renderTable() {
+  const tableBody = document.getElementById("matchesTable");
+  tableBody.innerHTML = "";
+  matches.forEach((m, i) => {
+    tableBody.innerHTML += `
+      <tr>
+        <td>${i + 1}</td>
         <td>${m.teams}</td>
         <td>${m.date}</td>
         <td>${m.time}</td>
@@ -132,91 +255,107 @@ function renderTable(){
         <td><img src="${m.img1}" class="preview"></td>
         <td><img src="${m.img2}" class="preview"></td>
         <td>
-            <button class="edit" onclick="editMatch(${i})">Edit</button>
-            <button class="delete" onclick="deleteMatch(${i})">Delete</button>
+          <button class="edit" onclick="editMatch(${i})">Edit</button>
+          <button class="delete" onclick="deleteMatch(${i})">Delete</button>
         </td>
-        </tr>`;
-    });
+      </tr>`;
+  });
 }
 
-async function saveMatch(e){
-    e.preventDefault();
-    const teams=document.getElementById('teams').value;
-    const date=document.getElementById('date').value;
-    const time=document.getElementById('time').value;
-    const stadium=document.getElementById('stadium').value;
+async function saveMatch(event) {
+  event.preventDefault();
+  const teams = document.getElementById("teams").value.trim();
+  const date = document.getElementById("date").value;
+  const time = document.getElementById("time").value;
+  const stadium = document.getElementById("stadium").value.trim();
 
-    let img1=matches[editIndex]?.img1||"";
-    let img2=matches[editIndex]?.img2||"";
+  if (!teams || !date || !time || !stadium) {
+    alert("Please fill all fields.");
+    return;
+  }
 
-    const img1File=document.getElementById('img1').files[0];
-    const img2File=document.getElementById('img2').files[0];
+  let img1 = editIndex >= 0 ? matches[editIndex].img1 : "";
+  let img2 = editIndex >= 0 ? matches[editIndex].img2 : "";
 
-    if(img1File) img1=await toBase64(img1File);
-    if(img2File) img2=await toBase64(img2File);
+  const img1File = document.getElementById("img1").files[0];
+  const img2File = document.getElementById("img2").files[0];
 
-    const match={teams,date,time,stadium,img1,img2};
+  if (img1File) img1 = await toBase64(img1File);
+  if (img2File) img2 = await toBase64(img2File);
 
-    if(editIndex>=0){
-        matches[editIndex]=match;
-        editIndex=-1;
-    } else matches.push(match);
+  const match = { teams, date, time, stadium, img1, img2 };
 
-    localStorage.setItem('iplMatches',JSON.stringify(matches));
+  if (editIndex >= 0) {
+    matches[editIndex] = match;
+    editIndex = -1;
+  } else {
+    matches.push(match);
+  }
+
+  localStorage.setItem("iplMatches", JSON.stringify(matches));
+  renderTable();
+
+  document.getElementById("matchForm").reset();
+  document.getElementById("preview1").style.display = "none";
+  document.getElementById("preview2").style.display = "none";
+  alert("Match saved successfully!");
+}
+
+function editMatch(index) {
+  const m = matches[index];
+  document.getElementById("teams").value = m.teams;
+  document.getElementById("date").value = m.date;
+  document.getElementById("time").value = m.time;
+  document.getElementById("stadium").value = m.stadium;
+  document.getElementById("preview1").src = m.img1;
+  document.getElementById("preview2").src = m.img2;
+  document.getElementById("preview1").style.display = "inline-block";
+  document.getElementById("preview2").style.display = "inline-block";
+  editIndex = index;
+}
+
+function deleteMatch(index) {
+  if (confirm("Are you sure to delete this match?")) {
+    matches.splice(index, 1);
+    localStorage.setItem("iplMatches", JSON.stringify(matches));
     renderTable();
-    document.getElementById('matchForm').reset();
-    document.getElementById('preview1').style.display="none";
-    document.getElementById('preview2').style.display="none";
+  }
 }
 
-function editMatch(index){
-    const m=matches[index];
-    document.getElementById('teams').value=m.teams;
-    document.getElementById('date').value=m.date;
-    document.getElementById('time').value=m.time;
-    document.getElementById('stadium').value=m.stadium;
-    document.getElementById('preview1').src=m.img1;
-    document.getElementById('preview2').src=m.img2;
-    document.getElementById('preview1').style.display="inline-block";
-    document.getElementById('preview2').style.display="inline-block";
-    editIndex=index;
-}
-
-function deleteMatch(index){
-    if(confirm("Are you sure to delete this match?")){
-        matches.splice(index,1);
-        localStorage.setItem('iplMatches',JSON.stringify(matches));
-        renderTable();
-    }
-}
-
-document.getElementById('img1').addEventListener('change', function(){
-    if(this.files[0]){
-        const reader=new FileReader();
-        reader.onload=()=>{document.getElementById('preview1').src=reader.result; document.getElementById('preview1').style.display="inline-block";}
-        reader.readAsDataURL(this.files[0]);
-    }
+document.getElementById("img1").addEventListener("change", function () {
+  if (this.files[0]) {
+    const reader = new FileReader();
+    reader.onload = () => {
+      document.getElementById("preview1").src = reader.result;
+      document.getElementById("preview1").style.display = "inline-block";
+    };
+    reader.readAsDataURL(this.files[0]);
+  }
 });
 
-document.getElementById('img2').addEventListener('change', function(){
-    if(this.files[0]){
-        const reader=new FileReader();
-        reader.onload=()=>{document.getElementById('preview2').src=reader.result; document.getElementById('preview2').style.display="inline-block";}
-        reader.readAsDataURL(this.files[0]);
-    }
+document.getElementById("img2").addEventListener("change", function () {
+  if (this.files[0]) {
+    const reader = new FileReader();
+    reader.onload = () => {
+      document.getElementById("preview2").src = reader.result;
+      document.getElementById("preview2").style.display = "inline-block";
+    };
+    reader.readAsDataURL(this.files[0]);
+  }
 });
 
-document.getElementById('matchForm').addEventListener('submit', saveMatch);
+document.addEventListener("DOMContentLoaded", function () {
+  const form = document.getElementById("matchForm");
+  if (form) form.addEventListener("submit", saveMatch);
+  if (localStorage.getItem("isAdmin") === "true") showDashboard();
+});
 
-function showDashboard(){
-    document.getElementById('loginBox').style.display="none";
-    document.getElementById('dashboard').style.display="block";
-    document.getElementById('adminUser').textContent=localStorage.getItem('adminUser');
-    renderTable();
+function showDashboard() {
+  document.getElementById("loginBox").style.display = "none";
+  document.getElementById("dashboard").style.display = "block";
+  document.getElementById("adminUser").textContent = localStorage.getItem("adminUser");
+  renderTable();
 }
-
-if(localStorage.getItem('isAdmin')==='true') showDashboard();
 </script>
-
 </body>
 </html>
