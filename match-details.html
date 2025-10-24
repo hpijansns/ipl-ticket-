@@ -68,6 +68,7 @@ h2 {
   gap: 12px;
   margin-bottom: 20px;
 }
+
 .seat-type {
   flex: 1 1 40%;
   padding: 15px;
@@ -78,7 +79,11 @@ h2 {
   cursor: pointer;
   transition: 0.3s;
 }
-.seat-type.active { outline: 4px solid #000; transform: scale(1.05); }
+
+.seat-type.active {
+  outline: 4px solid #000;
+  transform: scale(1.05);
+}
 
 /* Color-coded seat types */
 .general {background:#6EC6FF;}
@@ -98,19 +103,31 @@ h2 {
   border-radius: 5px;
   display: none;
 }
-.price, .qty { margin-top: 15px; }
+
+.price, .qty {
+  margin-top: 15px;
+}
+
 .qty input {
   width: 40px;
   text-align: center;
   font-size: 16px;
 }
-.qty button { padding: 5px 10px; font-size: 16px; cursor: pointer; }
+
+.qty button {
+  padding: 5px 10px;
+  font-size: 16px;
+  cursor: pointer;
+}
+
 .total {
   margin-top: 20px;
   font-size: 18px;
   font-weight: bold;
 }
+
 .total span { color: red; }
+
 .proceed-btn {
   margin-top: 20px;
   background: #d32f2f;
@@ -122,6 +139,7 @@ h2 {
   cursor: pointer;
   width: 100%;
 }
+
 .proceed-btn:hover { background: #b71c1c; }
 
 .image-center img {
@@ -151,21 +169,21 @@ h2 {
 
 <!-- Booking Summary -->
 <div class="box">
-<h2>Booking Summary</h2>
-<div class="description" id="descBox"></div>
+  <h2>Booking Summary</h2>
+  <div class="description" id="descBox"></div>
 
-<div class="price"><strong>Price per Ticket:</strong> ₹<span id="ticketPrice">0</span></div>
+  <div class="price"><strong>Price per Ticket:</strong> ₹<span id="ticketPrice">0</span></div>
 
-<div class="qty">
-  <strong>Quantity:</strong>
-  <button onclick="changeQty(-1)">-</button>
-  <input type="text" id="qty" value="1" readonly>
-  <button onclick="changeQty(1)">+</button>
-</div>
+  <div class="qty">
+    <strong>Quantity:</strong>
+    <button onclick="changeQty(-1)">-</button>
+    <input type="text" id="qty" value="1" readonly>
+    <button onclick="changeQty(1)">+</button>
+  </div>
 
-<div class="total">Total: ₹ <span id="total">0</span></div>
+  <div class="total">Total: ₹ <span id="total">0</span></div>
 
-<button class="proceed-btn" onclick="goToPayment()">Proceed to Booking</button>
+  <button class="proceed-btn" onclick="goToPayment()">Proceed to Booking</button>
 </div>
 
 <script>
@@ -174,6 +192,7 @@ let price = 0;
 
 // Load match data from localStorage
 const match = JSON.parse(localStorage.getItem("selectedMatch"));
+
 if(match){
   document.getElementById("details").innerHTML = `
     <h2 style="text-align:center;">${match.teams}</h2>
@@ -221,6 +240,9 @@ seatTypes.forEach(seat=>{
   seatMap.appendChild(div);
 });
 
+// Auto-select first seat
+seatMap.firstChild.click();
+
 function changeQty(val){
   let qty = parseInt(document.getElementById('qty').value);
   qty = Math.max(1, qty + val);
@@ -234,11 +256,17 @@ function updateTotal(){
 }
 
 function goToPayment(){
+  if(!match){
+    alert("No match selected. Please select a match first.");
+    return;
+  }
+
   const qty = parseInt(document.getElementById('qty').value);
   if(!selectedSeat || price === 0){
     alert("Please select a ticket type.");
     return;
   }
+
   const paymentData = {
     seatType: selectedSeat,
     price,
@@ -246,8 +274,9 @@ function goToPayment(){
     total: price * qty,
     matchDetails: match
   };
+
   localStorage.setItem("paymentInfo", JSON.stringify(paymentData));
-  window.location.href = "payment.html"; // next page
+  window.location.href = "payment.html"; // redirect to payment page
 }
 </script>
 
