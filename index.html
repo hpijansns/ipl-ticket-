@@ -8,8 +8,6 @@
 <style>
 *{margin:0;padding:0;box-sizing:border-box;font-family:'Roboto',sans-serif;}
 html,body{background:#fff;width:100%;}
-
-/* Header */
 header{
     width:100%;
     background:#333545;
@@ -25,23 +23,17 @@ header{
 header img.logo{height:40px;}
 .nav-links a{color:#fff;text-decoration:none;margin:0 10px;font-size:14px;}
 .nav-links a:hover{text-decoration:underline;}
-
-/* Banner - 3464x605 ratio fix */
 .header-banner img{
   width:100%;
   height: auto; 
-  aspect-ratio: 5.72 / 1; /* 3464/605 approx */
+  aspect-ratio: 5.72 / 1; 
   object-fit: cover; 
   display:block;
   border-bottom:4px solid #f84464;
   border-radius:5px;
 }
-
-/* Matches Section */
 .matches-section{padding:20px;}
 .matches-section h2{color:#000;font-size:22px;margin-bottom:20px;font-weight:700; text-align:center;}
-
-/* Cards Grid */
 .cards-container {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
@@ -77,8 +69,6 @@ header img.logo{height:40px;}
   color:#f84464;
   margin:0 10px;
 }
-
-/* Card Body */
 .card-body {
   padding:15px;
   text-align:center;
@@ -96,13 +86,9 @@ header img.logo{height:40px;}
   font-size:15px;
 }
 .card-body button:hover{background:#c4242b;}
-
-/* Footer */
 footer{background:#333545;color:#fff;padding:20px;text-align:center;}
 footer a{color:#fff;text-decoration:none;margin:0 10px;font-size:12px;}
 footer a:hover{text-decoration:underline;}
-
-/* Responsive */
 @media(max-width:600px){
   .cards-container{grid-template-columns:1fr;}
   .card .team-vs img{width:100px;height:100px;}
@@ -138,9 +124,11 @@ footer a:hover{text-decoration:underline;}
 <script>
 const defaultImg = "https://iili.io/K8L5Ots.jpg";
 
+// Banner Load
 const banner = localStorage.getItem('bannerURL') || defaultImg;
 document.getElementById('banner-img').src = banner;
 
+// Matches Load
 const matches = JSON.parse(localStorage.getItem('iplMatches')) || [];
 
 const container = document.getElementById('matches-container');
@@ -152,6 +140,7 @@ if (matches.length === 0) {
 } else {
     noMatches.style.display = 'none';
     matches.forEach((match,index)=>{
+        // Image source is correctly set to match.img1/img2
         const img1Src = match.img1 || defaultImg;
         const img2Src = match.img2 || defaultImg;
 
