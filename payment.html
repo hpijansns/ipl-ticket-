@@ -1,141 +1,283 @@
 <!DOCTYPE html>
-<html lang="hi">
+<html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Payment - IPL Tickets</title>
-<link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+<title>Booking Summary</title>
+<script src="right_click.js"></script>
 <style>
 body {
+  font-family: Arial, sans-serif;
+  background: #f9f9f9;
   margin: 0;
-  padding: 0;
-  font-family: 'Roboto', sans-serif;
-  background: #f0f0f0;
-  color: #000;
-}
-.container {
-  max-width: 800px;
-  margin: 30px auto;
   padding: 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 20px;
 }
-.payment-box {
-  background:#fff;
-  border-radius:15px;
-  padding:30px;
-  box-shadow:0 12px 25px rgba(0,0,0,0.1);
-  text-align:center;
-  border-top:6px solid #0b81d1;
+
+.match-card, .box, .seat-map {
+  background: white;
+  padding: 25px;
+  border-radius: 10px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+  max-width: 500px;
+  width: 100%;
+  box-sizing: border-box;
 }
-.payment-box h2 {font-size:28px;margin-bottom:20px;color:#000;font-weight:700;}
-.match-info {text-align:center;margin-bottom:20px;}
-.match-info img {max-width:100px;border-radius:10px;margin:5px;}
-.seats-list {display:flex;flex-wrap:wrap;justify-content:center;list-style:none;padding:0;margin:10px 0 20px 0;}
-.seats-list li {background:#0b81d1;color:#fff;padding:8px 12px;margin:5px;border-radius:8px;font-weight:500;}
-.total-amount {font-size:20px;font-weight:700;margin-bottom:15px;}
-.qr-container {margin:20px 0;display:inline-block;padding:15px;border:2px dashed #0b81d1;border-radius:15px;background:#f9f9f9;}
-.qr-container img {width:200px;height:200px;}
-input#utrInput {padding:12px;font-size:16px;width:90%;max-width:260px;border-radius:8px;border:1px solid #ccc;margin-top:15px;text-align:center;}
-button#payWithUTR {
-  padding:14px 25px;font-size:16px;font-weight:700;border:none;border-radius:10px;cursor:pointer;color:#fff;
-  background:linear-gradient(90deg,#4caf50,#43a047);margin-top:20px;transition:0.3s;
+
+h2 {
+  margin-bottom: 20px;
+  font-size: 22px;
 }
-button#payWithUTR:hover {background:linear-gradient(90deg,#43a047,#388e3c);}
+
+/* Match Details */
+.match-card img {
+  max-width: 100%;
+  border-radius: 10px;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+}
+
+.match-card .teams {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 20px;
+  margin-top: 10px;
+}
+
+.match-card .teams img {
+  width: 120px;
+  height: 120px;
+  object-fit: contain;
+  border-radius: 8px;
+}
+
+.match-card .vs {
+  font-size: 32px;
+  font-weight: 700;
+  color: #f84464;
+}
+
+/* Seat Map */
+.seat-map {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 12px;
+  margin-bottom: 20px;
+}
+
+.seat-type {
+  flex: 1 1 40%;
+  padding: 15px;
+  text-align: center;
+  color: #fff;
+  font-weight: bold;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+.seat-type.active {
+  outline: 4px solid #000;
+  transform: scale(1.05);
+}
+
+/* Color-coded seat types */
+.general {background:#6EC6FF;}
+.premium {background:#81C784;}
+.pavilion {background:#FFF176;color:#000;}
+.vip {background:#FFB74D;color:#000;}
+.corporate {background:#E57373;}
+.hospitality {background:#F06292;}
+.skybox {background:#3949AB;}
+
+/* Booking Summary */
+.description {
+  margin: 10px 0;
+  padding: 10px;
+  background: #e3f0ff;
+  border: 1px solid #4285f4;
+  border-radius: 5px;
+  display: none;
+}
+
+.price, .qty {
+  margin-top: 15px;
+}
+
+.qty input {
+  width: 40px;
+  text-align: center;
+  font-size: 16px;
+}
+
+.qty button {
+  padding: 5px 10px;
+  font-size: 16px;
+  cursor: pointer;
+}
+
+.total {
+  margin-top: 20px;
+  font-size: 18px;
+  font-weight: bold;
+}
+
+.total span { color: red; }
+
+.proceed-btn {
+  margin-top: 20px;
+  background: #d32f2f;
+  border: none;
+  color: white;
+  padding: 12px 20px;
+  font-size: 16px;
+  border-radius: 5px;
+  cursor: pointer;
+  width: 100%;
+}
+
+.proceed-btn:hover { background: #b71c1c; }
+
+.image-center img {
+  max-width: 100%;
+  border-radius: 10px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+}
+
+/* Responsive */
 @media(max-width:600px){
-  input#utrInput {width:90%;}
-  .qr-container img {width:150px;height:150px;}
+  .match-card .teams {
+    flex-direction: column;
+    gap: 10px;
+  }
+  .match-card .vs { font-size: 24px; margin: 5px 0; }
+  .seat-type { flex: 1 1 80%; font-size: 14px; padding:12px;}
 }
 </style>
 </head>
 <body>
 
-<div class="container">
-<div class="payment-box">
-<h2>Scan & Pay</h2>
+<!-- Match Details Section -->
+<div class="match-card" id="details"></div>
 
-<div class="match-info" id="matchInfo"></div>
+<!-- Seat Map Chart -->
+<div class="seat-map" id="seatMap"></div>
 
-<h3>Seats Selected</h3>
-<ul class="seats-list" id="seatList"></ul>
+<!-- Booking Summary -->
+<div class="box">
+  <h2>Booking Summary</h2>
+  <div class="description" id="descBox"></div>
 
-<p class="total-amount" id="totalAmount"></p>
+  <div class="price"><strong>Price per Ticket:</strong> ₹<span id="ticketPrice">0</span></div>
 
-<div class="qr-container">
-<img src="https://iili.io/K8pC8WG.png" alt="Scan to Pay QR">
-</div>
+  <div class="qty">
+    <strong>Quantity:</strong>
+    <button onclick="changeQty(-1)">-</button>
+    <input type="text" id="qty" value="1" readonly>
+    <button onclick="changeQty(1)">+</button>
+  </div>
 
-<p>Enter Transaction ID after payment:</p>
-<input type="text" id="utrInput" placeholder="Enter 12-digit UTR">
+  <div class="total">Total: ₹ <span id="total">0</span></div>
 
-<br>
-<button id="payWithUTR">Pay Now</button>
-</div>
+  <button class="proceed-btn" onclick="goToPayment()">Proceed to Booking</button>
 </div>
 
 <script>
-// Example / Demo Data
-if(!localStorage.getItem('paymentInfo')){
-    localStorage.setItem('paymentInfo', JSON.stringify({
-        matchDetails: {
-            teams: "Mumbai Indians vs Chennai Super Kings",
-            date: "2025-10-25",
-            time: "19:30",
-            stadium: "Wankhede Stadium",
-            img1: "https://iili.io/K8L5Ots.jpg",
-            img2: "https://iili.io/K8L5Ots.jpg"
-        },
-        seats: ["S1","S2","S3"],
-        total: 1500
-    }));
+let selectedSeat = null;
+let price = 0;
+
+// Load match data from localStorage
+const match = JSON.parse(localStorage.getItem("selectedMatch"));
+
+if(match){
+  document.getElementById("details").innerHTML = `
+    <h2 style="text-align:center;">${match.teams}</h2>
+    <p style="text-align:center;"><strong>Date:</strong> ${match.date} &nbsp; | &nbsp; <strong>Time:</strong> ${match.time || '—'}</p>
+    <p style="text-align:center;"><strong>Stadium:</strong> ${match.stadium}</p>
+    <div class="teams">
+      <img src="${match.img1}" alt="Team 1">
+      <div class="vs">VS</div>
+      <img src="${match.img2}" alt="Team 2">
+    </div>
+  `;
+}else{
+  document.getElementById("details").innerText = "No match preview found.";
 }
 
-// Get ticket data from localStorage
-const ticketData = JSON.parse(localStorage.getItem('paymentInfo'));
-if(!ticketData){ 
-  alert("No data found! Please select your seats again.");
-  window.location.href="match-details.html";
+// Seat types
+const seatTypes = [
+  {name:"General Stand",price:1000,desc:"Affordable seating, usually in the upper stands.",class:"general"},
+  {name:"Premium Stand",price:1500,desc:"Better view, closer to the field.",class:"premium"},
+  {name:"Pavilion Stand",price:3500,desc:"Good view near pitch.",class:"pavilion"},
+  {name:"VIP Stand",price:6000,desc:"Exclusive VIP access.",class:"vip"},
+  {name:"Corporate Box",price:8000,desc:"Luxury private box.",class:"corporate"},
+  {name:"Hospitality Box",price:10000,desc:"High-end hospitality and lounge.",class:"hospitality"},
+  {name:"Skybox/Lounge",price:16000,desc:"Topmost premium view with food & drinks.",class:"skybox"}
+];
+
+// Render seat map
+const seatMap = document.getElementById("seatMap");
+seatTypes.forEach(seat=>{
+  const div = document.createElement("div");
+  div.className = `seat-type ${seat.class}`;
+  div.innerText = seat.name;
+  div.dataset.price = seat.price;
+  div.dataset.desc = seat.desc;
+  div.addEventListener('click', ()=>{
+    document.querySelectorAll('.seat-type').forEach(s=>s.classList.remove('active'));
+    div.classList.add('active');
+    selectedSeat = seat.name;
+    price = seat.price;
+    document.getElementById('ticketPrice').innerText = price;
+    document.getElementById('descBox').innerText = `${selectedSeat} – ${seat.desc}`;
+    document.getElementById('descBox').style.display = 'block';
+    updateTotal();
+  });
+  seatMap.appendChild(div);
+});
+
+// Auto-select first seat
+seatMap.firstChild.click();
+
+function changeQty(val){
+  let qty = parseInt(document.getElementById('qty').value);
+  qty = Math.max(1, qty + val);
+  document.getElementById('qty').value = qty;
+  updateTotal();
 }
 
-// Show match info
-document.getElementById('matchInfo').innerHTML = `
-  <strong>${ticketData.matchDetails.teams}</strong><br>
-  ${ticketData.matchDetails.date} | ${ticketData.matchDetails.time || '—'} | ${ticketData.matchDetails.stadium}
-  <br><img src="${ticketData.matchDetails.img1}" alt="Team 1">
-  <img src="${ticketData.matchDetails.img2}" alt="Team 2">
-`;
+function updateTotal(){
+  const qty = parseInt(document.getElementById('qty').value);
+  document.getElementById('total').innerText = price * qty;
+}
 
-// Show selected seats
-const seatList = document.getElementById('seatList');
-seatList.innerHTML = "";
-ticketData.seats.forEach(seat=>{
-  const li = document.createElement('li');
-  li.textContent = seat;
-  seatList.appendChild(li);
-});
+function goToPayment(){
+  if(!match){
+    alert("No match selected. Please select a match first.");
+    return;
+  }
 
-// Show total amount
-document.getElementById('totalAmount').textContent = `Total Amount: ₹${ticketData.total}`;
+  const qty = parseInt(document.getElementById('qty').value);
+  if(!selectedSeat || price === 0){
+    alert("Please select a ticket type.");
+    return;
+  }
 
-// Pay button click
-document.getElementById('payWithUTR').addEventListener('click', ()=>{
-    const transactionID = document.getElementById('utrInput').value.trim();
+  const paymentData = {
+    seatType: selectedSeat,
+    price,
+    qty,
+    total: price * qty,
+    matchDetails: match
+  };
 
-    // Validate 12-digit UTR
-    const utrRegex = /^\d{12}$/;
-    const invalidSeqs = ['123456789012','111111111111','000000000000','112233445566'];
-
-    if(!utrRegex.test(transactionID) || invalidSeqs.includes(transactionID)){
-        alert("❌ Invalid Transaction ID! Please enter a valid 12-digit UTR.");
-        return;
-    }
-
-    // Save UTR with ticket data
-    ticketData.utr = transactionID;
-    localStorage.setItem('finalTicket', JSON.stringify(ticketData));
-
-    // Redirect to ticket page
-    alert("✅ Payment Successful! Redirecting to your Ticket...");
-    window.location.href = "ticket.html";
-});
+  localStorage.setItem("paymentInfo", JSON.stringify(paymentData));
+  window.location.href = "payment.html"; // redirect to payment page
+}
 </script>
 
 </body>
