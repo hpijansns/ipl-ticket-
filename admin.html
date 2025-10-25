@@ -39,9 +39,20 @@ button.delete:hover{background:#c4242b;}
 
 <div class="container" id="dashboard" style="display:none;">
 <header>
+<div style="display:flex;align-items:center;gap:10px;">
+<img id="headerLogo" src="" alt="Logo" style="height:40px;display:none;border-radius:5px;">
 <h3>Admin Dashboard - <span id="adminUser"></span></h3>
+</div>
 <button onclick="logout()">Logout</button>
 </header>
+
+<h2>Update Logo</h2>
+<form id="logoForm">
+<label>Upload Logo Image:</label>
+<input type="file" id="logoInput" accept="image/*">
+<img id="logoPreview" class="preview" style="display:none;">
+<button type="submit">Save Logo</button>
+</form>
 
 <h2>Update Banner</h2>
 <form id="bannerForm">
@@ -89,10 +100,19 @@ let matches = JSON.parse(localStorage.getItem("iplMatches"))||[];
 function login(){
   const u=document.getElementById("username").value.trim();
   const p=document.getElementById("password").value.trim();
-  if(u===ADMIN_USER&&p===ADMIN_PASS){localStorage.setItem("isAdmin","true");localStorage.setItem("adminUser",ADMIN_USER);showDashboard();}
-  else alert("Invalid username or password");
+  if(u===ADMIN_USER&&p===ADMIN_PASS){
+    localStorage.setItem("isAdmin","true");
+    localStorage.setItem("adminUser",ADMIN_USER);
+    showDashboard();
+  } else alert("Invalid username or password");
 }
-function logout(){localStorage.removeItem("isAdmin");localStorage.removeItem("adminUser");document.getElementById("dashboard").style.display="none";document.getElementById("loginBox").style.display="block";}
+
+function logout(){
+  localStorage.removeItem("isAdmin");
+  localStorage.removeItem("adminUser");
+  document.getElementById("dashboard").style.display="none";
+  document.getElementById("loginBox").style.display="block";
+}
 
 function toBase64(file){return new Promise((resolve,reject)=>{const reader=new FileReader();reader.onload=()=>resolve(reader.result);reader.onerror=(err)=>reject(err);reader.readAsDataURL(file);});}
 
@@ -138,7 +158,6 @@ async function saveMatch(e){
   const date=document.getElementById("date").value;
   const time=document.getElementById("time").value;
   const stadium=document.getElementById("stadium").value.trim();
-  
   if(!teams||!date||!time||!stadium){alert("Please fill all fields.");return;}
   
   let img1=editIndex>=0?matches[editIndex].img1:"";
@@ -147,23 +166,16 @@ async function saveMatch(e){
   const img1Url = document.getElementById("img1_url").value.trim();
   const img1File = document.getElementById("img1_file").files[0];
 
-  if (img1Url) {
-    img1 = img1Url;
-  } else if (img1File) {
-    try {img1=await toBase64(img1File);} catch (error) {console.error("Error converting img1:", error);}
-  }
-  
+  if (img1Url) { img1 = img1Url; } 
+  else if (img1File) { try {img1=await toBase64(img1File);} catch(e){console.error(e);} }
+
   const img2Url = document.getElementById("img2_url").value.trim();
   const img2File = document.getElementById("img2_file").files[0];
 
-  if (img2Url) {
-    img2 = img2Url;
-  } else if (img2File) {
-    try {img2=await toBase64(img2File);} catch (error) {console.error("Error converting img2:", error);}
-  }
+  if (img2Url) { img2 = img2Url; } 
+  else if (img2File) { try {img2=await toBase64(img2File);} catch(e){console.error(e);} }
 
   const match={teams,date,time,stadium,img1,img2};
-  
   if(editIndex>=0){matches[editIndex]=match;editIndex=-1;}else{matches.push(match);}
   
   localStorage.setItem("iplMatches",JSON.stringify(matches)); 
@@ -174,15 +186,13 @@ async function saveMatch(e){
   alert("Match saved successfully! Refresh the index.html page to see changes.");
 }
 
-
 function editMatch(index){
   const m=matches[index];
   document.getElementById("teams").value=m.teams;
   document.getElementById("date").value=m.date;
   document.getElementById("time").value=m.time;
   document.getElementById("stadium").value=m.stadium;
-  
-  // URL इनपुट को प्रीफ़िल करना
+
   document.getElementById("img1_url").value = m.img1.startsWith('http') ? m.img1 : '';
   document.getElementById("img2_url").value = m.img2.startsWith('http') ? m.img2 : '';
 
@@ -212,6 +222,7 @@ function loadBannerPreview() {
         bannerPreview.style.display = "inline-block";
     }
 }
+
 bannerInput.addEventListener("change",()=>{const file=bannerInput.files[0];if(file){const reader=new FileReader();reader.onload=()=>bannerPreview.src=reader.result;bannerPreview.style.display="inline-block";reader.readAsDataURL(file);}});
 
 document.getElementById("bannerForm").addEventListener("submit",e=>{
@@ -229,6 +240,46 @@ document.getElementById("bannerForm").addEventListener("submit",e=>{
 document.getElementById("img1_url").addEventListener("input", function() { previewImage(this, 'preview1'); });
 document.getElementById("img2_url").addEventListener("input", function() { previewImage(this, 'preview2'); });
 
+// Logo Logic
+const logoInput = document.getElementById("logoInput");
+const logoPreview = document.getElementById("logoPreview");
+const headerLogo = document.getElementById("headerLogo");
+
+function loadLogoPreview() {
+    const savedLogo = localStorage.getItem("logoURL");
+    if (savedLogo) {
+        logoPreview.src = savedLogo;
+        logoPreview.style.display = "inline-block";
+        headerLogo.src = savedLogo;
+        headerLogo.style.display = "inline-block";
+    }
+}
+
+logoInput.addEventListener("change", () => {
+    const file = logoInput.files[0];
+    if (file) {
+        const reader = new FileReader();
+        reader.onload = () => {
+            logoPreview.src = reader.result;
+            logoPreview.style.display = "inline-block";
+        };
+        reader.readAsDataURL(file);
+    }
+});
+
+document.getElementById("logoForm").addEventListener("submit", e => {
+    e.preventDefault();
+    if (logoInput.files[0]) {
+        const reader = new FileReader();
+        reader.onload = () => {
+            localStorage.setItem("logoURL", reader.result);
+            headerLogo.src = reader.result;
+            headerLogo.style.display = "inline-block";
+            alert("Logo saved successfully! Refresh the index.html page to see changes.");
+        };
+        reader.readAsDataURL(logoInput.files[0]);
+    } else { alert("Select an image first."); }
+});
 
 document.addEventListener("DOMContentLoaded",()=>{
   document.getElementById("matchForm").addEventListener("submit",saveMatch);
@@ -240,6 +291,7 @@ function showDashboard(){
   document.getElementById("dashboard").style.display="block";
   document.getElementById("adminUser").textContent=localStorage.getItem("adminUser");
   loadBannerPreview(); 
+  loadLogoPreview();
   renderTable();
 }
 </script>
