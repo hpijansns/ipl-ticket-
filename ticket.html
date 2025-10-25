@@ -118,6 +118,8 @@ body {
 }
 #downloadbtn:hover { background: #0468a8; }
 </style>
+<script src="https://www.gstatic.com/firebasejs/8.6.8/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.6.8/firebase-database.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.0/dist/JsBarcode.all.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/qrious@4.0.2/dist/qrious.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/dayjs@1.11.10/dayjs.min.js"></script>
@@ -127,31 +129,31 @@ body {
 <body>
 
 <div class="ticket" id="ticket">
-  <div class="meta-left"><small>TICKET SERIAL NO.</small><b id="sr-left">000001</b><small>TICKET CODE</small><div id="code-left">A000001</div></div>
-  <div class="meta-info utr">PRICE BREAKDOWN: <span id="basepricetext"></span></div> 
-  <div class="top-center-price"><small id="pricebreakup">INC. TAXES AND FEES</small><b>RS.<span id="totalprice">0</span></b></div>
-  <div class="meta-right"><small>MATCH ID</small><b id="sr-right">000001</b><small>QTY.</small><b id="roll-right">001</b></div>
-  <div class="meta-info booking">BOOKING ID: <span id="bookingid"></span></div> 
+  <div class="meta-left"><small>TICKET SERIAL NO.</small><b id="sr-left">...</b><small>TICKET CODE</small><div id="code-left">...</div></div>
+  <div class="meta-info utr">PRICE BREAKDOWN: <span id="basepricetext">...</span></div> 
+  <div class="top-center-price"><small id="pricebreakup">INC. TAXES AND FEES</small><b>RS.<span id="totalprice">...</span></b></div>
+  <div class="meta-right"><small>MATCH ID</small><b id="sr-right">...</b><small>QTY.</small><b id="roll-right">...</b></div>
+  <div class="meta-info booking">BOOKING ID: <span id="bookingid">...</span></div> 
 
   <div class="main">
     <div class="left">
       <div class="biglogo"><img id="leftlogo" src="" alt="Team Logo"></div>
-      <div class="teamname" id="leftteam"></div>
+      <div class="teamname" id="leftteam">...</div>
     </div>
     <div class="center">
       <div class="small-logos">
         <div class="box"><img id="ipllogo" src="" alt="IPL"></div>
         <div class="box"><img id="oppsmalllogo" src="" alt="Opponent Logo"></div>
       </div>
-      <div class="matchno" id="matchno"></div>
-      <div class="teams" id="teamstext"></div>
-      <div class="date" id="datetext"></div>
-      <div class="stadium" id="stadtext"></div>
-      <div class="gate-ghost" id="gateghost">1</div>
+      <div class="matchno" id="matchno">...</div>
+      <div class="teams" id="teamstext">...</div>
+      <div class="date" id="datetext">...</div>
+      <div class="stadium" id="stadtext">...</div>
+      <div class="gate-ghost" id="gateghost">...</div>
     </div>
     <div class="right">
       <div class="qr-box"><canvas id="qrcodeCanvas" width="100" height="100"></canvas></div> 
-      <div class="mini-text">TICKET CODE: <span id="ticketcode"></span></div>
+      <div class="mini-text">TICKET CODE: <span id="ticketcode">...</span></div>
       <div class="valid-if">VALID ONLY IF BARCODE & QR CODE ARE INTACT</div>
       <div class="barcode-box"><svg id="barcode"></svg></div>
     </div>
@@ -159,132 +161,172 @@ body {
   </div>
 
   <div class="bottom">
-    <div class="cell"><small>MATCH START</small><span id="matchstart"></span></div>
-    <div class="cell"><small>ENTRY TIME</small><span id="entrytime"></span></div>
-    <div class="cell"><small>ZONE</small><span id="zone"></span></div> 
-    <div class="cell"><small>TIER/BLOCK</small><span id="tier"></span></div> 
-    <div class="cell"><small>ROW</small><span id="row"></span></div> 
-    <div class="cell"><small>SEAT</small><span id="seat"></span></div> 
-    <div class="cell"><small>GATE</small><span id="gate"></span></div>
+    <div class="cell"><small>MATCH START</small><span id="matchstart">...</span></div>
+    <div class="cell"><small>ENTRY TIME</small><span id="entrytime">...</span></div>
+    <div class="cell"><small>ZONE</small><span id="zone">...</span></div> 
+    <div class="cell"><small>TIER/BLOCK</small><span id="tier">...</span></div> 
+    <div class="cell"><small>ROW</small><span id="row">...</span></div> 
+    <div class="cell"><small>SEAT</small><span id="seat">...</span></div> 
+    <div class="cell"><small>GATE</small><span id="gate">...</span></div>
   </div>
 </div>
 
 <button id="downloadbtn">DOWNLOAD OFFICIAL E-TICKET</button>
 
 <script>
-// --- Ticket Data ---
+// --- Ticket Data and Firebase Setup ---
 const DEFAULT_LOGO = "https://iili.io/K8L5Ots.jpg";
 const DEFAULT_IPL_LOGO = "https://upload.wikimedia.org/wikipedia/commons/3/3a/Indian_Premier_League_logo.svg";
 
-const updatedTicket = {
-  matchDetails: {
-    teams: "Chennai Super Kings vs Mumbai Indians",
-    stadium: "Wankhede Stadium, Mumbai",
-    date: "2025-10-25",
-    time: "19:30",
-    img1: "https://iili.io/K8L5Ots.jpg",
-    img2: "https://iili.io/Jc8702V.png"
-  },
-  price: 2500,
-  qty: 1,
-  total: 2950,
-  seatType: "VIP",
-  bookingId: "BMS123999",
-  utr: "1234567890"
+// 💡 Firebase Configuration
+const firebaseConfig = {
+    databaseURL: "https://pl-project-f9be7-default-rtdb.firebaseio.com/",
 };
 
-localStorage.setItem('finalTicket', JSON.stringify(updatedTicket));
-const ticketData = JSON.parse(localStorage.getItem('finalTicket'));
-const match = ticketData.matchDetails;
-const teamsArray = match.teams.split(" vs ");
-const team1Name = teamsArray[0] || "Team 1";
-const team2Name = teamsArray[1] || "Team 2";
+// Initialize Firebase
+if (!firebase.apps.length) {
+    firebase.initializeApp(firebaseConfig);
+}
 
-// Random seat/gate
-const ZONES = ["NORTH", "SOUTH", "EAST", "WEST"];
-const TIERS_PREFIX = ["LOWER", "UPPER", "EXECUTIVE"];
-const ROW_LETTERS = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+const database = firebase.database();
 
-const GATE = (Math.floor(Math.random() * 8) + 1).toString().padStart(2,"0");
-const ZONE = ZONES[Math.floor(Math.random() * ZONES.length)];
-const TIER_BLOCK = TIERS_PREFIX[Math.floor(Math.random() * TIERS_PREFIX.length)].substring(0,1)+ (Math.floor(Math.random()*5)+1); 
-const ROW = ROW_LETTERS[Math.floor(Math.random()*ROW_LETTERS.length)];
-const SEAT_NO = (Math.floor(Math.random()*50)+1).toString().padStart(3,"0");
+/**
+ * Firebase से टिकट डेटा फ़ेच करता है। 
+ * आपको 'ticket_A001' को डायनामिक रूप से बदलने की आवश्यकता होगी।
+ */
+async function fetchTicketDataFromFirebase() {
+    // ⚠️ REPLACE 'ticket_A001' with the actual ticket identifier you want to fetch
+    const TICKET_ID_TO_FETCH = 'ticket_A001'; 
+    const ticketRef = database.ref(`matches/${TICKET_ID_TO_FETCH}`);
 
-// Match Start and Entry Time
-let matchStart = 'N/A';
-let entryTime = 'N/A';
-if(match.date && match.time){
-    const matchDateTime = dayjs(`${match.date}T${match.time}`);
-    if(matchDateTime.isValid()){
-        matchStart = matchDateTime.format('h:mm A');
-        entryTime = matchDateTime.subtract(2.5,'hours').format('h:mm A');
+    try {
+        const snapshot = await ticketRef.once('value');
+        if (snapshot.exists()) {
+            return snapshot.val();
+        } else {
+            console.error(`No ticket data found in Firebase at the specified path: matches/${TICKET_ID_TO_FETCH}`);
+            alert("Failed to load ticket details: Data not found in Firebase.");
+            // Default Fallback Data Structure
+            return {
+                matchDetails: {
+                    teams: "Team A vs Team B",
+                    stadium: "Unknown Stadium, City",
+                    date: "2025-01-01",
+                    time: "10:00",
+                    img1: DEFAULT_LOGO,
+                    img2: DEFAULT_LOGO
+                },
+                price: 1500, qty: 1, total: 1770, seatType: "GENERAL", bookingId: "DEFAULT000", utr: "0000000000"
+            };
+        }
+    } catch (error) {
+        console.error("Error fetching data from Firebase:", error);
+        alert("Failed to load ticket details. Please check console for network/Firebase errors.");
+        return null;
     }
 }
 
-// Ticket Numbers
-const matchNo = (Math.floor(Math.random()*50)+1).toString().padStart(2,"0");
-const ticketNo = `M${matchNo}-${ZONE.substring(0,1)}${TIER_BLOCK}-${ROW}${SEAT_NO}`;
-const qrDataContent = `TKT-${ticketNo}-${ticketData.qty}-${match.date}-${ticketData.bookingId.slice(-6)}`;
-const uniqueBarcodeData = ticketData.utr;
+// --- Main Initialization Function ---
+async function initializeTicket() {
+    const ticketData = await fetchTicketDataFromFirebase();
+    if (!ticketData) return; // Stop if data fetching failed
 
-// Price Breakdown
-const basePrice = ticketData.price;
-const taxesAndFees = Math.round(basePrice*0.18);
-const finalTotal = basePrice*ticketData.qty;
+    // 💡 Fetch logic now uses ticketData from Firebase
+    const match = ticketData.matchDetails;
+    const teamsArray = match.teams.split(" vs ");
+    const team1Name = teamsArray[0] || "Team 1";
+    const team2Name = teamsArray[1] || "Team 2";
 
-// Apply VIP Style if needed
-const ticketElement = document.getElementById('ticket');
-if(ticketData.seatType.toLowerCase().includes('vip')){
-    ticketElement.classList.add('vip-style');
+    // Random seat/gate (Keep this random logic or replace with Firebase data if available)
+    const ZONES = ["NORTH", "SOUTH", "EAST", "WEST"];
+    const TIERS_PREFIX = ["LOWER", "UPPER", "EXECUTIVE"];
+    const ROW_LETTERS = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+
+    const GATE = (Math.floor(Math.random() * 8) + 1).toString().padStart(2,"0");
+    const ZONE = ZONES[Math.floor(Math.random() * ZONES.length)];
+    const TIER_BLOCK = TIERS_PREFIX[Math.floor(Math.random() * TIERS_PREFIX.length)].substring(0,1)+ (Math.floor(Math.random()*5)+1); 
+    const ROW = ROW_LETTERS[Math.floor(Math.random()*ROW_LETTERS.length)];
+    const SEAT_NO = (Math.floor(Math.random()*50)+1).toString().padStart(3,"0");
+
+    // Match Start and Entry Time
+    let matchStart = 'N/A';
+    let entryTime = 'N/A';
+    if(match.date && match.time){
+        const matchDateTime = dayjs(`${match.date}T${match.time}`);
+        if(matchDateTime.isValid()){
+            matchStart = matchDateTime.format('h:mm A');
+            entryTime = matchDateTime.subtract(2.5,'hours').format('h:mm A');
+        }
+    }
+
+    // Ticket Numbers
+    const matchNo = (Math.floor(Math.random()*50)+1).toString().padStart(2,"0");
+    const ticketNo = `M${matchNo}-${ZONE.substring(0,1)}${TIER_BLOCK}-${ROW}${SEAT_NO}`;
+    const qrDataContent = `TKT-${ticketNo}-${ticketData.qty}-${match.date}-${ticketData.bookingId.slice(-6)}`;
+    const uniqueBarcodeData = ticketData.utr;
+
+    // Price Breakdown
+    const basePrice = ticketData.price;
+    // Assuming taxes are 18% for calculation if not explicitly provided by Firebase
+    const taxesAndFees = Math.round(basePrice*0.18); 
+    const finalTotal = ticketData.total || (basePrice * ticketData.qty + taxesAndFees); // Use provided total or calculate
+
+    // Apply VIP Style if needed
+    const ticketElement = document.getElementById('ticket');
+    if(ticketData.seatType && ticketData.seatType.toLowerCase().includes('vip')){
+        ticketElement.classList.add('vip-style');
+    }
+
+    // Header Metadata
+    document.getElementById('sr-left').textContent = ticketNo;
+    document.getElementById('sr-right').textContent = `Match ${matchNo}`;
+    document.getElementById('roll-right').textContent = ticketData.qty;
+    document.getElementById('code-left').textContent = `A${ticketNo.substring(ticketNo.length-6)}`;
+    document.getElementById('ticketcode').textContent = qrDataContent.slice(0,15)+'...';
+    document.getElementById('basepricetext').textContent = `₹${basePrice} + ₹${taxesAndFees} (TAXES)`;
+    document.getElementById('bookingid').textContent = ticketData.bookingId || 'N/A';
+    document.getElementById('totalprice').textContent = finalTotal;
+
+    // Main Center Content
+    document.getElementById('leftlogo').src = match.img1 || DEFAULT_LOGO;
+    document.getElementById('leftteam').textContent = team1Name;
+    document.getElementById('ipllogo').src = DEFAULT_IPL_LOGO;
+    document.getElementById('oppsmalllogo').src = match.img2 || DEFAULT_LOGO;
+    document.getElementById('matchno').textContent = `OFFICIAL TICKET | ${(ticketData.seatType || 'GENERAL').toUpperCase()} | MATCH ${matchNo}`;
+    document.getElementById('teamstext').textContent = match.teams;
+    document.getElementById('datetext').textContent = `DATE: ${match.date} | GATES OPEN: ${entryTime}`;
+    document.getElementById('stadtext').textContent = match.stadium;
+
+    // Bottom Band
+    document.getElementById('matchstart').textContent = matchStart;
+    document.getElementById('entrytime').textContent = entryTime;
+    document.getElementById('zone').textContent = ZONE;
+    document.getElementById('tier').textContent = TIER_BLOCK;
+    document.getElementById('row').textContent = ROW;
+    document.getElementById('seat').textContent = SEAT_NO;
+    document.getElementById('gate').textContent = GATE;
+    document.getElementById('gateghost').textContent = GATE;
+
+    // Barcode
+    JsBarcode("#barcode", uniqueBarcodeData, {
+        format:"CODE128",
+        displayValue:false,
+        width:2,
+        height:50,
+        margin:0
+    });
+
+    // QR Code
+    new QRious({
+        element: document.getElementById('qrcodeCanvas'),
+        value: qrDataContent,
+        size:100,
+        level:'H'
+    });
 }
 
-// Header Metadata
-document.getElementById('sr-left').textContent = ticketNo;
-document.getElementById('sr-right').textContent = `Match ${matchNo}`;
-document.getElementById('roll-right').textContent = ticketData.qty;
-document.getElementById('code-left').textContent = `A${ticketNo.substring(ticketNo.length-6)}`;
-document.getElementById('ticketcode').textContent = qrDataContent.slice(0,15)+'...';
-document.getElementById('basepricetext').textContent = `₹${basePrice} + ₹${taxesAndFees} (TAXES)`;
-document.getElementById('bookingid').textContent = ticketData.bookingId || 'N/A';
-document.getElementById('totalprice').textContent = finalTotal;
-
-// Main Center Content
-document.getElementById('leftlogo').src = match.img1 || DEFAULT_LOGO;
-document.getElementById('leftteam').textContent = team1Name;
-document.getElementById('ipllogo').src = DEFAULT_IPL_LOGO;
-document.getElementById('oppsmalllogo').src = match.img2 || DEFAULT_LOGO;
-document.getElementById('matchno').textContent = `OFFICIAL TICKET | ${ticketData.seatType.toUpperCase()} | MATCH ${matchNo}`;
-document.getElementById('teamstext').textContent = match.teams;
-document.getElementById('datetext').textContent = `DATE: ${match.date} | GATES OPEN: ${entryTime}`;
-document.getElementById('stadtext').textContent = match.stadium;
-
-// Bottom Band
-document.getElementById('matchstart').textContent = matchStart;
-document.getElementById('entrytime').textContent = entryTime;
-document.getElementById('zone').textContent = ZONE;
-document.getElementById('tier').textContent = TIER_BLOCK;
-document.getElementById('row').textContent = ROW;
-document.getElementById('seat').textContent = SEAT_NO;
-document.getElementById('gate').textContent = GATE;
-document.getElementById('gateghost').textContent = GATE;
-
-// Barcode
-JsBarcode("#barcode", uniqueBarcodeData, {
-    format:"CODE128",
-    displayValue:false,
-    width:2,
-    height:50,
-    margin:0
-});
-
-// QR Code
-new QRious({
-    element: document.getElementById('qrcodeCanvas'),
-    value: qrDataContent,
-    size:100,
-    level:'H'
-});
+// Start the whole process by calling the new function
+initializeTicket();
 
 // Download Function
 document.getElementById('downloadbtn').addEventListener('click',()=>{
@@ -293,7 +335,7 @@ document.getElementById('downloadbtn').addEventListener('click',()=>{
     html2canvas(document.getElementById('ticket'),{scale:3,useCORS:true}).then(canvas=>{
         const link = document.createElement('a');
         link.href = canvas.toDataURL('image/png');
-        link.download = `IPL_E-TICKET_${ticketNo}.png`;
+        link.download = `IPL_E-TICKET_${document.getElementById('sr-left').textContent}.png`;
         link.click();
         document.getElementById('downloadbtn').style.display='block';
     });
