@@ -92,7 +92,6 @@ button.delete:hover{background:#c4242b;}
 </table>
 </div>
 
-<!-- Firebase -->
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js";
 import { getDatabase, ref, set, get, child, remove, update } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-database.js";
@@ -108,8 +107,12 @@ const ADMIN_USER = "7627055204", ADMIN_PASS = "Pooja2005";
 let editIndex = -1;
 let matches = [];
 
+// =========================================================================
+// FIX: login() और logout() को Global Scope में उपलब्ध कराने के लिए window पर असाइन करें।
+// =========================================================================
+
 // Login / Logout
-function login() {
+window.login = function() {
   const u = document.getElementById("username").value.trim();
   const p = document.getElementById("password").value.trim();
   if (u === ADMIN_USER && p === ADMIN_PASS) {
@@ -118,12 +121,14 @@ function login() {
     showDashboard();
   } else alert("Invalid username or password");
 }
-function logout() {
+
+window.logout = function() {
   localStorage.removeItem("isAdmin");
   localStorage.removeItem("adminUser");
   document.getElementById("dashboard").style.display = "none";
   document.getElementById("loginBox").style.display = "block";
 }
+// =========================================================================
 
 // Utility: File to Base64
 function toBase64(file) {
@@ -201,10 +206,13 @@ async function saveMatch(e){
   const match = {teams,date,time,stadium,img1,img2};
 
   if(editIndex>=0){
-    const key = Object.keys(await get(ref(db,"matches")).then(s=>s.val()))[editIndex];
+    // Update existing match
+    const keys = Object.keys((await get(ref(db,"matches"))).val());
+    const key = keys[editIndex];
     await update(ref(db,"matches/"+key),match);
     editIndex = -1;
   } else {
+    // Add new match
     await set(ref(db,"matches/"+Date.now()),match);
   }
 
@@ -215,8 +223,8 @@ async function saveMatch(e){
   alert("Match saved successfully!");
 }
 
-// Edit Match
-function editMatch(index){
+// Edit Match (MUST be defined globally to work with onclick)
+window.editMatch = function(index){
   const m = matches[index];
   document.getElementById("teams").value = m.teams;
   document.getElementById("date").value = m.date;
@@ -231,8 +239,8 @@ function editMatch(index){
   editIndex = index;
 }
 
-// Delete Match
-async function deleteMatch(index){
+// Delete Match (MUST be defined globally to work with onclick)
+window.deleteMatch = async function(index){
   if(!confirm("Are you sure to delete this match?")) return;
   const keys = Object.keys((await get(ref(db,"matches"))).val());
   await remove(ref(db,"matches/"+keys[index]));
