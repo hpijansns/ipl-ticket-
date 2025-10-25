@@ -34,7 +34,6 @@ button.delete:hover{background:#c4242b;}
 <input type="text" id="username" placeholder="Phone / Username">
 <input type="password" id="password" placeholder="Password">
 <button onclick="login()">Login</button>
-<p style="font-size:12px;color:#666;margin-top:10px;">Demo: <strong>7627055204</strong> / <strong>Pooja2005</strong></p>
 </div>
 
 <div class="container" id="dashboard" style="display:none;">
@@ -103,15 +102,13 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const db = getDatabase(app);
 
-const ADMIN_USER = "7627055204", ADMIN_PASS = "Pooja2005";
+// आपकी जानकारी अब केवल यहाँ JavaScript मॉड्यूल के अंदर है (जो कि क्लाइंट-साइड ही है, लेकिन HTML से अलग है)।
+// ध्यान दें: सबसे अच्छी सुरक्षा के लिए, एडमिन लॉगिन हमेशा एक सर्वर-साइड चेक (जैसे Firebase Authentication) से होना चाहिए।
+const ADMIN_USER = "7627055204", ADMIN_PASS = "Pooja2005"; 
 let editIndex = -1;
 let matches = [];
 
-// =========================================================================
-// FIX: login() और logout() को Global Scope में उपलब्ध कराने के लिए window पर असाइन करें।
-// =========================================================================
-
-// Login / Logout
+// login(), logout(), editMatch() और deleteMatch() को Global Scope में उपलब्ध कराने के लिए window पर असाइन करें।
 window.login = function() {
   const u = document.getElementById("username").value.trim();
   const p = document.getElementById("password").value.trim();
@@ -206,13 +203,11 @@ async function saveMatch(e){
   const match = {teams,date,time,stadium,img1,img2};
 
   if(editIndex>=0){
-    // Update existing match
     const keys = Object.keys((await get(ref(db,"matches"))).val());
     const key = keys[editIndex];
     await update(ref(db,"matches/"+key),match);
     editIndex = -1;
   } else {
-    // Add new match
     await set(ref(db,"matches/"+Date.now()),match);
   }
 
@@ -223,7 +218,7 @@ async function saveMatch(e){
   alert("Match saved successfully!");
 }
 
-// Edit Match (MUST be defined globally to work with onclick)
+// Edit Match
 window.editMatch = function(index){
   const m = matches[index];
   document.getElementById("teams").value = m.teams;
@@ -239,7 +234,7 @@ window.editMatch = function(index){
   editIndex = index;
 }
 
-// Delete Match (MUST be defined globally to work with onclick)
+// Delete Match
 window.deleteMatch = async function(index){
   if(!confirm("Are you sure to delete this match?")) return;
   const keys = Object.keys((await get(ref(db,"matches"))).val());
